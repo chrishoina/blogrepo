@@ -1,10 +1,8 @@
 # Instructions
 
-## What goes in here? 
+## Config_dir contents
 
-You'll want to include two files in this directory (folder):
-- `ewallet.pem` 
+You'll need to download, unzip and then place both files in this directory;
+
+- `ewallet.pem`
 - `tnsnames.ora`
-
-You need both of these files to successfully run `test3.py` 
-
