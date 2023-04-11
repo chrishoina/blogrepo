@@ -2,7 +2,7 @@
 # The username for the user accessing the database. In this case, I created a separate "devuser". Just make sure, whatever it is, you use it for all three
 # tests (otherwise it could become an issue when you get to the OAuth2.0 client steps in "test3.py" 
 # uname = "[user name]"
-uname = "devuser"
+uname = ""
 
 # pwd = "[the password for the above user]"
 pwd = ""
