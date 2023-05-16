@@ -14,4 +14,6 @@ url = (test2_url + '?q={"location":"ZAF","value":{"$gt":100},"$orderby":{"value"
 # This works, but you can see how it gets verbose, quick. Its a great jumping-off point.
 
 responsefromadb = requests.get(url)
+print(responsefromadb.text)
+print(responsefromadb.status_code)
 pprint.pprint(responsefromadb.json())
