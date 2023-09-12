@@ -1,0 +1,44 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:8080/ords/ordstest
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 10
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 25
+      name: Ramp up load
+    - duration: 120
+      arrivalRate: 25
+      rampTo: 50
+      name: Spike phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+  ensure:
+      thresholds:
+        - http.response_time.p99: 100
+        - http.response_time.p95: 75
+scenarios:
+  - flow:
+      - loop:
+          - post:
+              url: "/_/sql"
+              body: |
+                {"statementText": "select * from (     \n  select noc, sport     \n  from   olympic_medal_winners     \n)     \npivot (min('X') for sport in (     \n  'Archery' as arc, 'Athletics' as ath, 'Hockey' as hoc,   \n  'Judo' as jud, 'Sailing' as sai, 'Wrestling' as wre  \n  )      \n)     \norder  by noc     \nfetch  first 7 rows only"}
+              headers:
+                content-Type: application/json
+                Authorization: Basic b3Jkc3Rlc3Q6cGFzc3dvcmQxMjM0
+          - get:
+              url: "/oly_data/matrix/"
+          - get:
+              url: "/matrix_view/"    
+        count: 50
