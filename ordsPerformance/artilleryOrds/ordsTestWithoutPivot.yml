@@ -1,0 +1,34 @@
+config:
+  target: http://localhost:8080/ords/ordstest
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 5
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 15
+      name: Ramp up load
+    - duration: 180
+      arrivalRate: 15
+      rampTo: 30
+      name: Spike phase
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 750
+  ensure:
+      thresholds:
+        - http.response_time.p99: 500
+        - http.response_time.p95: 450
+scenario:
+  - flow:
+      - post:
+          url: "/_/sql"
+          body: |
+            {"statementText": "select noc, \n    count ( case when medal = 'Gold' then 1 end ) GOLD, \n    count ( case when medal = 'Silver' then 1 end ) SILVER, \n    count ( case when medal = 'Bronze' then 1 end ) BRONZE\nfrom   olympic_medal_winners\ngroup  by noc\norder  by 2 desc, 3 desc, 4 desc\nfetch first 10 rows only"}
+          headers:
+            content-Type: application/json
+            Authorization: Basic b3Jkc3Rlc3Q6cGFzc3dvcmQxMjM0
+    count: 100

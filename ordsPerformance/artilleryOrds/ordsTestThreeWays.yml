@@ -1,8 +1,8 @@
 config:
-  # This is a test server run by team Artillery
-  # It's designed to be highly scalable
+# The tests will use this as the Base URI/URL. Yours will differ slightly. But if you are doing this when ORDS is in Standalone mode, it will probably look very similar. 
   target: http://localhost:8080/ords/ordstest
   phases:
+# I'm not sure what the nest values are here, but you can adjust accordingly. I arbitrarily chose these values.
     - duration: 60
       arrivalRate: 1
       rampTo: 10
@@ -11,12 +11,12 @@ config:
       arrivalRate: 10
       rampTo: 25
       name: Ramp up load
+# Keep in mind, your API may "crap out" at a certain point. If it does, you may need to modify or increase your connection pool settings. 
     - duration: 120
       arrivalRate: 25
       rampTo: 50
       name: Spike phase
-  # Load & configure a couple of useful plugins
-  # https://docs.art/reference/extensions
+# There is a ton of info in the Artillery documents about which plug-ins to use. From what I understand, these are the bare minimum.
   plugins:
     ensure: {}
     apdex: {}
@@ -27,9 +27,16 @@ config:
       thresholds:
         - http.response_time.p99: 100
         - http.response_time.p95: 75
+# The only goal here, is to compare these three different approaches and just...see what we see.
 scenarios:
   - flow:
+# I am "looping" through each one of these scenarios for however many times I indicate in the "count" below.
       - loop:
+# These are all the same sql query, but I'm going about it three different ways. 
+
+# 1. In the first example I'm using the REST-Enabled SQL Service (which is a POST request).
+# 2. In the second example, I took that SQL query and used it as the Handler code in a Resource Handler (i.e. create an ORDS Resource Module > Resource Template > Resource Handler).
+# 3. In the third example, I created a "view" and used the SQL query therein.
           - post:
               url: "/_/sql"
               body: |
