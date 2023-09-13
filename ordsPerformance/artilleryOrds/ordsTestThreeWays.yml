@@ -10,7 +10,7 @@ config:
     - duration: 60
       arrivalRate: 10
       rampTo: 25
-      name: Ramp up load
+      name: Ramp up phase
 # Keep in mind, your API may "crap out" at a certain point. If it does, you may need to modify or increase your connection pool settings. 
     - duration: 120
       arrivalRate: 25

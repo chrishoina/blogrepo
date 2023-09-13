@@ -4,10 +4,11 @@ config:
     - duration: 60
       arrivalRate: 1
       rampTo: 5
+      name: Warm up phase
     - duration: 60
       arrivalRate: 5
       rampTo: 15
-      name: Ramp up load
+      name: Ramp up phase
     - duration: 180
       arrivalRate: 15
       rampTo: 30
@@ -25,10 +26,15 @@ config:
 scenarios:
   - flow:
       - post:
+# I was able to get this to work by taking that "/_/sql" portion of the URI, and placing it here in the "url:" section.
           url: "/_/sql"
+# I was able to get this to work as JSON object (this is in the Artillery docs). The newlines (e.g. \n) were tricky, but this DOES work!
+
+# This example below will work, TO A POINT, just like the test WITH a Pivot table. But you'll soon see, that its not the SQL itself that "craps out", but rather the available connections that become the bottleneck. Just like in the "with Pivot" test, there will be ALOT of "frustrated" connections, and others that just completely time-out.
           body: |
-            {"statementText": "select * from (\n  select noc, medal from olympic_medal_winners\n)\n  pivot ( \n  count(*) for medal in ( \n    'Gold' gold, 'Silver' silver, 'Bronze' bronze \n  )\n)\norder  by 2 desc, 3 desc, 4 desc\nfetch first 10 rows only"}
+            {"statementText": "select * from (\n  select noc, medal, sport, event, gender\n  from   olympic_medal_winners\n)\npivot ( \n  count ( distinct sport ||'#'|| event ||'#'||gender ) \n  for medal in ( \n    'Gold' gold, 'Silver' silver, 'Bronze' bronze\n  )\n)\norder  by 2 desc, 3 desc, 4 desc\nfetch first 10 rows only"}
           headers:
             content-Type: application/json
+# Displaying the user credentials like this, in Base64 encoding, was the only way I could make this work. A quick way to Base64 encode your credentials and make it "url safe" is like this on the command line (using my credentials as an example): echo -n ordstest:password1234 | base64
             Authorization: Basic b3Jkc3Rlc3Q6cGFzc3dvcmQxMjM0
     count: 100
