@@ -31,7 +31,7 @@ Begin
   Execute Immediate 'Grant Connect To &&NEWUSER';
   Execute Immediate 'Grant Resource To &&NEWUSER';
   Execute Immediate 'Grant Unlimited Tablespace To &&NEWUSER';
-  plsql_block := 'Begin ORDS_ADMIN.ENABLE_SCHEMA(p_schema => :1); End;';
+  plsql_block := 'Begin ORDS_ADMIN.ENABLE_SCHEMA(p_schema => :1); Commit; End;';
   Execute Immediate plsql_block using NEWUSER;
   End If;
 End;
