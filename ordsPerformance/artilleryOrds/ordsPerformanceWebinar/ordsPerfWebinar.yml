@@ -1,0 +1,39 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:8080/ords/ordstest/perftest
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 3
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 3
+      rampTo: 5
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 10
+      name: Spike phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+  ensure:
+      thresholds:
+        - http.response_time.p99: 100
+        - http.response_time.p95: 75
+scenarios:
+  - flow:
+      - loop:
+        - get:
+            url: "/one/"
+        - get:
+            url: "/onefive/"
+        - get:
+            url: "/onesevenfive/"
+        count: 20
