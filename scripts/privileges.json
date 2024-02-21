@@ -1,0 +1,227 @@
+[
+{"privilege":"ALTER SYSTEM"}
+,{"privilege":"AUDIT SYSTEM"}
+,{"privilege":"CREATE SESSION"}
+,{"privilege":"ALTER SESSION"}
+,{"privilege":"RESTRICTED SESSION"}
+,{"privilege":"CREATE TABLESPACE"}
+,{"privilege":"ALTER TABLESPACE"}
+,{"privilege":"MANAGE TABLESPACE"}
+,{"privilege":"DROP TABLESPACE"}
+,{"privilege":"UNLIMITED TABLESPACE"}
+,{"privilege":"CREATE USER"}
+,{"privilege":"BECOME USER"}
+,{"privilege":"ALTER USER"}
+,{"privilege":"DROP USER"}
+,{"privilege":"CREATE ROLLBACK SEGMENT"}
+,{"privilege":"ALTER ROLLBACK SEGMENT"}
+,{"privilege":"DROP ROLLBACK SEGMENT"}
+,{"privilege":"CREATE TABLE"}
+,{"privilege":"CREATE ANY TABLE"}
+,{"privilege":"ALTER ANY TABLE"}
+,{"privilege":"DROP ANY TABLE"}
+,{"privilege":"LOCK ANY TABLE"}
+,{"privilege":"COMMENT ANY TABLE"}
+,{"privilege":"SELECT ANY TABLE"}
+,{"privilege":"INSERT ANY TABLE"}
+,{"privilege":"UPDATE ANY TABLE"}
+,{"privilege":"DELETE ANY TABLE"}
+,{"privilege":"REDEFINE ANY TABLE"}
+,{"privilege":"CREATE CLUSTER"}
+,{"privilege":"CREATE ANY CLUSTER"}
+,{"privilege":"ALTER ANY CLUSTER"}
+,{"privilege":"DROP ANY CLUSTER"}
+,{"privilege":"CREATE ANY INDEX"}
+,{"privilege":"ALTER ANY INDEX"}
+,{"privilege":"DROP ANY INDEX"}
+,{"privilege":"CREATE SYNONYM"}
+,{"privilege":"CREATE ANY SYNONYM"}
+,{"privilege":"DROP ANY SYNONYM"}
+,{"privilege":"CREATE PUBLIC SYNONYM"}
+,{"privilege":"DROP PUBLIC SYNONYM"}
+,{"privilege":"CREATE VIEW"}
+,{"privilege":"CREATE ANY VIEW"}
+,{"privilege":"DROP ANY VIEW"}
+,{"privilege":"CREATE SEQUENCE"}
+,{"privilege":"CREATE ANY SEQUENCE"}
+,{"privilege":"ALTER ANY SEQUENCE"}
+,{"privilege":"DROP ANY SEQUENCE"}
+,{"privilege":"SELECT ANY SEQUENCE"}
+,{"privilege":"CREATE DATABASE LINK"}
+,{"privilege":"CREATE PUBLIC DATABASE LINK"}
+,{"privilege":"DROP PUBLIC DATABASE LINK"}
+,{"privilege":"CREATE ROLE"}
+,{"privilege":"DROP ANY ROLE"}
+,{"privilege":"GRANT ANY ROLE"}
+,{"privilege":"ALTER ANY ROLE"}
+,{"privilege":"AUDIT ANY"}
+,{"privilege":"ALTER DATABASE"}
+,{"privilege":"FORCE ANY TRANSACTION"}
+,{"privilege":"CREATE PROCEDURE"}
+,{"privilege":"CREATE ANY PROCEDURE"}
+,{"privilege":"ALTER ANY PROCEDURE"}
+,{"privilege":"DROP ANY PROCEDURE"}
+,{"privilege":"EXECUTE ANY PROCEDURE"}
+,{"privilege":"CREATE TRIGGER"}
+,{"privilege":"CREATE ANY TRIGGER"}
+,{"privilege":"ALTER ANY TRIGGER"}
+,{"privilege":"DROP ANY TRIGGER"}
+,{"privilege":"CREATE PROFILE"}
+,{"privilege":"ALTER PROFILE"}
+,{"privilege":"DROP PROFILE"}
+,{"privilege":"ALTER RESOURCE COST"}
+,{"privilege":"ANALYZE ANY"}
+,{"privilege":"CREATE MATERIALIZED VIEW"}
+,{"privilege":"CREATE ANY MATERIALIZED VIEW"}
+,{"privilege":"ALTER ANY MATERIALIZED VIEW"}
+,{"privilege":"DROP ANY MATERIALIZED VIEW"}
+,{"privilege":"CREATE ANY DIRECTORY"}
+,{"privilege":"DROP ANY DIRECTORY"}
+,{"privilege":"CREATE TYPE"}
+,{"privilege":"CREATE ANY TYPE"}
+,{"privilege":"ALTER ANY TYPE"}
+,{"privilege":"DROP ANY TYPE"}
+,{"privilege":"EXECUTE ANY TYPE"}
+,{"privilege":"UNDER ANY TYPE"}
+,{"privilege":"ALTER ANY LIBRARY"}
+,{"privilege":"DROP ANY LIBRARY"}
+,{"privilege":"EXECUTE ANY LIBRARY"}
+,{"privilege":"CREATE LOGICAL PARTITION TRACKING"}
+,{"privilege":"DROP LOGICAL PARTITION TRACKING"}
+,{"privilege":"CREATE OPERATOR"}
+,{"privilege":"CREATE ANY OPERATOR"}
+,{"privilege":"ALTER ANY OPERATOR"}
+,{"privilege":"DROP ANY OPERATOR"}
+,{"privilege":"EXECUTE ANY OPERATOR"}
+,{"privilege":"CREATE INDEXTYPE"}
+,{"privilege":"CREATE ANY INDEXTYPE"}
+,{"privilege":"ALTER ANY INDEXTYPE"}
+,{"privilege":"DROP ANY INDEXTYPE"}
+,{"privilege":"UNDER ANY VIEW"}
+,{"privilege":"QUERY REWRITE"}
+,{"privilege":"GLOBAL QUERY REWRITE"}
+,{"privilege":"EXECUTE ANY INDEXTYPE"}
+,{"privilege":"UNDER ANY TABLE"}
+,{"privilege":"CREATE DIMENSION"}
+,{"privilege":"CREATE ANY DIMENSION"}
+,{"privilege":"ALTER ANY DIMENSION"}
+,{"privilege":"DROP ANY DIMENSION"}
+,{"privilege":"MANAGE ANY QUEUE"}
+,{"privilege":"ENQUEUE ANY QUEUE"}
+,{"privilege":"DEQUEUE ANY QUEUE"}
+,{"privilege":"CREATE ANY CONTEXT"}
+,{"privilege":"DROP ANY CONTEXT"}
+,{"privilege":"CREATE ANY OUTLINE"}
+,{"privilege":"ALTER ANY OUTLINE"}
+,{"privilege":"DROP ANY OUTLINE"}
+,{"privilege":"ADMINISTER RESOURCE MANAGER"}
+,{"privilege":"ADMINISTER DATABASE TRIGGER"}
+,{"privilege":"MERGE ANY VIEW"}
+,{"privilege":"ON COMMIT REFRESH"}
+,{"privilege":"EXEMPT ACCESS POLICY"}
+,{"privilege":"RESUMABLE"}
+,{"privilege":"SELECT ANY DICTIONARY"}
+,{"privilege":"DEBUG CONNECT SESSION"}
+,{"privilege":"DEBUG CONNECT ANY"}
+,{"privilege":"DEBUG ANY PROCEDURE"}
+,{"privilege":"FLASHBACK ANY TABLE"}
+,{"privilege":"GRANT ANY OBJECT PRIVILEGE"}
+,{"privilege":"CREATE EVALUATION CONTEXT"}
+,{"privilege":"CREATE ANY EVALUATION CONTEXT"}
+,{"privilege":"ALTER ANY EVALUATION CONTEXT"}
+,{"privilege":"DROP ANY EVALUATION CONTEXT"}
+,{"privilege":"EXECUTE ANY EVALUATION CONTEXT"}
+,{"privilege":"CREATE RULE SET"}
+,{"privilege":"CREATE ANY RULE SET"}
+,{"privilege":"ALTER ANY RULE SET"}
+,{"privilege":"DROP ANY RULE SET"}
+,{"privilege":"EXECUTE ANY RULE SET"}
+,{"privilege":"CREATE RULE"}
+,{"privilege":"CREATE ANY RULE"}
+,{"privilege":"ALTER ANY RULE"}
+,{"privilege":"DROP ANY RULE"}
+,{"privilege":"EXECUTE ANY RULE"}
+,{"privilege":"ANALYZE ANY DICTIONARY"}
+,{"privilege":"ADVISOR"}
+,{"privilege":"CREATE JOB"}
+,{"privilege":"CREATE ANY JOB"}
+,{"privilege":"MANAGE SCHEDULER"}
+,{"privilege":"SELECT ANY TRANSACTION"}
+,{"privilege":"DROP ANY SQL PROFILE"}
+,{"privilege":"ALTER ANY SQL PROFILE"}
+,{"privilege":"ADMINISTER SQL TUNING SET"}
+,{"privilege":"ADMINISTER ANY SQL TUNING SET"}
+,{"privilege":"CREATE ANY SQL PROFILE"}
+,{"privilege":"READ ANY FILE GROUP"}
+,{"privilege":"CHANGE NOTIFICATION"}
+,{"privilege":"CREATE ANY EDITION"}
+,{"privilege":"DROP ANY EDITION"}
+,{"privilege":"ALTER ANY EDITION"}
+,{"privilege":"CREATE ASSEMBLY"}
+,{"privilege":"CREATE ANY ASSEMBLY"}
+,{"privilege":"ALTER ANY ASSEMBLY"}
+,{"privilege":"DROP ANY ASSEMBLY"}
+,{"privilege":"EXECUTE ANY ASSEMBLY"}
+,{"privilege":"EXECUTE ASSEMBLY"}
+,{"privilege":"CREATE MINING MODEL"}
+,{"privilege":"CREATE ANY MINING MODEL"}
+,{"privilege":"DROP ANY MINING MODEL"}
+,{"privilege":"SELECT ANY MINING MODEL"}
+,{"privilege":"ALTER ANY MINING MODEL"}
+,{"privilege":"COMMENT ANY MINING MODEL"}
+,{"privilege":"CREATE CUBE DIMENSION"}
+,{"privilege":"ALTER ANY CUBE DIMENSION"}
+,{"privilege":"CREATE ANY CUBE DIMENSION"}
+,{"privilege":"DELETE ANY CUBE DIMENSION"}
+,{"privilege":"DROP ANY CUBE DIMENSION"}
+,{"privilege":"INSERT ANY CUBE DIMENSION"}
+,{"privilege":"SELECT ANY CUBE DIMENSION"}
+,{"privilege":"CREATE CUBE"}
+,{"privilege":"ALTER ANY CUBE"}
+,{"privilege":"CREATE ANY CUBE"}
+,{"privilege":"DROP ANY CUBE"}
+,{"privilege":"SELECT ANY CUBE"}
+,{"privilege":"UPDATE ANY CUBE"}
+,{"privilege":"CREATE MEASURE FOLDER"}
+,{"privilege":"CREATE ANY MEASURE FOLDER"}
+,{"privilege":"DELETE ANY MEASURE FOLDER"}
+,{"privilege":"DROP ANY MEASURE FOLDER"}
+,{"privilege":"INSERT ANY MEASURE FOLDER"}
+,{"privilege":"CREATE CUBE BUILD PROCESS"}
+,{"privilege":"CREATE ANY CUBE BUILD PROCESS"}
+,{"privilege":"DROP ANY CUBE BUILD PROCESS"}
+,{"privilege":"UPDATE ANY CUBE BUILD PROCESS"}
+,{"privilege":"UPDATE ANY CUBE DIMENSION"}
+,{"privilege":"ADMINISTER SQL MANAGEMENT OBJECT"}
+,{"privilege":"CREATE SQL TRANSLATION PROFILE"}
+,{"privilege":"CREATE ANY SQL TRANSLATION PROFILE"}
+,{"privilege":"ALTER ANY SQL TRANSLATION PROFILE"}
+,{"privilege":"DROP ANY SQL TRANSLATION PROFILE"}
+,{"privilege":"KEEP DATE TIME"}
+,{"privilege":"KEEP SYSGUID"}
+,{"privilege":"PURGE DBA_RECYCLEBIN"}
+,{"privilege":"EXEMPT REDACTION POLICY"}
+,{"privilege":"TRANSLATE ANY SQL"}
+,{"privilege":"CREATE PLUGGABLE DATABASE"}
+,{"privilege":"SET CONTAINER"}
+,{"privilege":"CREATE LOCKDOWN PROFILE"}
+,{"privilege":"DROP LOCKDOWN PROFILE"}
+,{"privilege":"ALTER LOCKDOWN PROFILE"}
+,{"privilege":"SELECT ANY MEASURE FOLDER"}
+,{"privilege":"ALTER ANY MEASURE FOLDER"}
+,{"privilege":"SELECT ANY CUBE BUILD PROCESS"}
+,{"privilege":"ALTER ANY CUBE BUILD PROCESS"}
+,{"privilege":"READ ANY TABLE"}
+,{"privilege":"CREATE ATTRIBUTE DIMENSION"}
+,{"privilege":"CREATE ANY ATTRIBUTE DIMENSION"}
+,{"privilege":"ALTER ANY ATTRIBUTE DIMENSION"}
+,{"privilege":"DROP ANY ATTRIBUTE DIMENSION"}
+,{"privilege":"CREATE HIERARCHY"}
+,{"privilege":"CREATE ANY HIERARCHY"}
+,{"privilege":"ALTER ANY HIERARCHY"}
+,{"privilege":"DROP ANY HIERARCHY"}
+,{"privilege":"CREATE ANALYTIC VIEW"}
+,{"privilege":"CREATE ANY ANALYTIC VIEW"}
+,{"privilege":"ALTER ANY ANALYTIC VIEW"}
+,{"privilege":"DROP ANY ANALYTIC VIEW"}
+]

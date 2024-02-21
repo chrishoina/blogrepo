@@ -1,0 +1,1248 @@
+LinkChecker 10.4.0
+Copyright (C) 2000-2016 Bastian Kleineidam, 2010-2023 LinkChecker Authors
+LinkChecker comes with ABSOLUTELY NO WARRANTY!
+This is free software, and you are welcome to redistribute it under
+certain conditions. Look at the file `COPYING' within this distribution.
+Read the documentation at https://linkchecker.github.io/linkchecker/
+Write comments and bugs to https://github.com/linkchecker/linkchecker/issues
+
+Start checking at 2024-02-06 10:03:38-004
+
+URL        `https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html'
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html
+Check time 1.126 seconds
+D/L time   0.083 seconds
+Size       869.60KB
+Result     Valid: 200 OK
+
+URL        `../toc.js'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 16, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/toc.js
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `../toc.css'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 15, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/toc.css
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `../styles.css'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 14, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/styles.css
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 12, col 1
+Real URL   https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10, col 1
+Real URL   https://fonts.googleapis.com/css?family=Open%20Sans:300,300italic,400,400italic,600,600italic%7CNoto%20Serif:400,400italic,700,700italic%7CDroid%20Sans%20Mono:400,700
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/documentation/jetty-12/programming-guide/index.html'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3, col 7
+Real URL   https://eclipse.dev/jetty/documentation/jetty-12/programming-guide/index.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `mailto:jetty-dev@eclipse.org'
+Name       `jetty-dev@eclipse.org'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 23, col 32
+Real URL   mailto:jetty-dev@eclipse.org
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.org/jetty'
+Name       `Eclipse Jetty'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 20, col 5
+Real URL   https://eclipse.org/jetty
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://openjdk.java.net/jeps/380'
+Name       `JEP 380'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 747, col 4
+Real URL   https://openjdk.java.net/jeps/380
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/SelectorManager.html'
+Name       `SelectorManager'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 620, col 57
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/SelectorManager.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ClientConnector.html'
+Name       `ClientConnector'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 617, col 39
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ClientConnector.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol'
+Name       `SMTP'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 989, col 100
+Real URL   https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/Promise.html'
+Name       `Promise'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 794, col 229
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/Promise.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ClientConnectionFactory.html'
+Name       `ClientConnectionFactory'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 794, col 30
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ClientConnectionFactory.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/api/Response.Listener.html'
+Name       `Response.Listener'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 1681, col 208
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/api/Response.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/api/Request.Listener.html'
+Name       `Request.Listener'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 1681, col 23
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/api/Request.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc4559'
+Name       `RFC 4559'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2217, col 253
+Real URL   https://tools.ietf.org/html/rfc4559
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/PHP#PHPFPM'
+Name       `PHP-FPM'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2586, col 101
+Real URL   https://en.wikipedia.org/wiki/PHP#PHPFPM
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc1928'
+Name       `RFC 1928'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2351, col 24
+Real URL   https://datatracker.ietf.org/doc/html/rfc1928
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Stream.Client.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3480, col 57
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Stream.Client.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc8441'
+Name       `RFC 8441'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3771, col 85
+Real URL   https://tools.ietf.org/html/rfc8441
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/websocket/api/Session.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4325, col 45
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/websocket/api/Session.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc6455#section-1.8'
+Name       `RFC 6455'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3723, col 85
+Real URL   https://tools.ietf.org/html/rfc6455#section-1.8
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc1945'
+Name       `RFC 1945'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4841, col 4
+Real URL   https://datatracker.ietf.org/doc/html/rfc1945
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/HttpChannel.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5175, col 58
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/HttpChannel.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://www.openssl.org/'
+Name       `OpenSSL'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5697, col 249
+Real URL   https://www.openssl.org/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/server/ServerSessionListener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7020, col 59
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/server/ServerSessionListener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionHandler.html'
+Name       `SessionHandlers'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7843, col 41
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionHandler.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://maven.apache.org/pom.html#Plugins'
+Name       `configuring maven plugins'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11158, col 240
+Real URL   http://maven.apache.org/pom.html#Plugins
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionDataStore.html'
+Name       `NullSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8450, col 16
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://www.jcp.org/en/jsr/detail?id=356'
+Name       `JSR 356'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9085, col 85
+Real URL   https://www.jcp.org/en/jsr/detail?id=356
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/memcached/session/MemcachedSessionDataMap.html'
+Name       `MemcachedSessionDataMap'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9037, col 85
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/memcached/session/MemcachedSessionDataMap.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://owasp.org/www-community/attacks/csrf'
+Name       `cross-site request forgery attacks'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9920, col 72
+Real URL   https://owasp.org/www-community/attacks/csrf
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionDataMap.html'
+Name       `SessionDataMap'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9036, col 37
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionDataMap.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `./asciidoctor.css'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/asciidoctor.css
+Check time 0.310 seconds
+Size       7KB
+Result     Valid: 200 OK
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/ServerConnector.html'
+Name       `ServerConnector'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10926, col 39
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/ServerConnector.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/HouseKeeper.html'
+Name       `HouseKeeper'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7842, col 30
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/HouseKeeper.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-'
+Name       `javadoc'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11330, col 74
+Real URL   http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://repo1.maven.org/maven2/org/glassfish/web/javax.servlet.jsp/2.3.2/javax.servlet.jsp-2.3.2-javadoc.jar'
+Name       `here'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 12512, col 30
+Real URL   https://repo1.maven.org/maven2/org/glassfish/web/javax.servlet.jsp/2.3.2/javax.servlet.jsp-2.3.2-javadoc.jar
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/unixdomain/server/UnixDomainServerConnector.html'
+Name       `UnixDomainServerConnector'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13458, col 450
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/unixdomain/server/UnixDomainServerConnector.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/quic/server/QuicServerConnector.html'
+Name       `QuicServerConnector'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13458, col 283
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/quic/server/QuicServerConnector.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/ConnectionFactory.html'
+Name       `ConnectionFactory'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13455, col 82
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/ConnectionFactory.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/HttpClientTransport.html'
+Name       `HttpClientTransport'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13461, col 142
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/HttpClientTransport.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/DatagramChannelEndPoint.html'
+Name       `DatagramChannelEndPoint'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13440, col 232
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/DatagramChannelEndPoint.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/SocketChannelEndPoint.html'
+Name       `SocketChannelEndPoint'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13440, col 80
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/SocketChannelEndPoint.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/Connection.html'
+Name       `Connection'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13423, col 244
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/Connection.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/EndPoint.html'
+Name       `EndPoint'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13423, col 124
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/EndPoint.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ManagedSelector.html'
+Name       `ManagedSelector'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13358, col 77
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/io/ManagedSelector.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/thread/QueuedThreadPool.html'
+Name       `QueuedThreadPool'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13248, col 56
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/thread/QueuedThreadPool.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://en.wikipedia.org/wiki/Head-of-line_blocking'
+Name       `head-of-line blocking'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13151, col 150
+Real URL   http://en.wikipedia.org/wiki/Head-of-line_blocking
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Parallel_slowdown'
+Name       `parallel slowdown'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13093, col 52
+Real URL   https://en.wikipedia.org/wiki/Parallel_slowdown
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://www.mojohaus.org/'
+Name       `maven properties plugin'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 12255, col 37
+Real URL   http://www.mojohaus.org/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://maven.apache.org/plugins/maven-war-plugin/overlays.html'
+Name       `maven-war-plugin'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11995, col 32
+Real URL   http://maven.apache.org/plugins/maven-war-plugin/overlays.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://maven.apache.org/plugins/maven-war-plugin/'
+Name       `maven-war-plugin'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11949, col 43
+Real URL   http://maven.apache.org/plugins/maven-war-plugin/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/webapp/WebAppContext.hml'
+Name       `org.eclipse.jetty.webapp.WebAppContext'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11233, col 226
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/webapp/WebAppContext.hml
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/maven/plugin/MavenWebAppContext.html'
+Name       `org.eclipse.jetty.maven.plugin.MavenWebAppContext'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 11233, col 27
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/maven/plugin/MavenWebAppContext.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://localhost:8080/'
+Name       `http://localhost:8080/'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10842, col 52
+Real URL   http://localhost:8080/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://localhost:8080/hello'
+Name       `http://localhost:8080/hello'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10708, col 56
+Real URL   http://localhost:8080/hello
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://localhost:8080'
+Name       `http://localhost:8080'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10551, col 40
+Real URL   http://localhost:8080
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://maven.apache.org/guides/introduction/introduction-to-archetypes.html'
+Name       `archetypes'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10435, col 39
+Real URL   http://maven.apache.org/guides/introduction/introduction-to-archetypes.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://maven.apache.org/'
+Name       `Apache Maven'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10392, col 4
+Real URL   http://maven.apache.org/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/CachingSessionDataStore.html'
+Name       `CachingSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9032, col 8
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/CachingSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/nosql/mongodb/MongoSessionDataStore.html'
+Name       `MongoSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8871, col 104
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/nosql/mongodb/MongoSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Database_catalog'
+Name       `https://en.wikipedia.org/wiki/Database_catalog'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8790, col 128
+Real URL   https://en.wikipedia.org/wiki/Database_catalog
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Database_schema'
+Name       `https://en.wikipedia.org/wiki/Database_schema'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8790, col 5
+Real URL   https://en.wikipedia.org/wiki/Database_schema
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/JDBCSessionDataStoreFactory.html'
+Name       `JDBCSessionDataStoreFactory'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8701, col 163
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/JDBCSessionDataStoreFactory.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/JDBCSessionDataStore.html'
+Name       `JDBCSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8701, col 8
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/JDBCSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/FileSessionDataStore.html'
+Name       `FileSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8519, col 31
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/FileSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/AbstractSessionDataStore.html'
+Name       `AbstractSessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8398, col 8
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/AbstractSessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionDataStore.html'
+Name       `SessionDataStore'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8388, col 6
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionDataStore.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionCacheFactory.html'
+Name       `NullSessionCacheFactory'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8311, col 15
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionCacheFactory.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionCacheFactory.html'
+Name       `DefaultSessionFactory'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8265, col 20
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionCacheFactory.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionCache.html'
+Name       `NullSessionCache'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8229, col 213
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/NullSessionCache.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionCache.html'
+Name       `DefaultSessionCache'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8229, col 70
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionCache.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionCache.html#shutdown()'
+Name       `SessionCache.shutdown()'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8218, col 104
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/SessionCache.html#shutdown()
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/AbstractSessionCache.html'
+Name       `AbstractSessionCache'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8163, col 8
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/AbstractSessionCache.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionIdManager.html'
+Name       `DefaultSessionIdManager'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7765, col 50
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/session/DefaultSessionIdManager.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Session.Server.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7454, col 61
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Session.Server.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc4918'
+Name       `RFC 4918'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6903, col 41
+Real URL   https://tools.ietf.org/html/rfc4918
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc2518'
+Name       `RFC 2518'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6891, col 4
+Real URL   https://tools.ietf.org/html/rfc2518
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc7231#section-5.1.1'
+Name       `HTTP/1.1 RFC'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6833, col 8
+Real URL   https://tools.ietf.org/html/rfc7231#section-5.1.1
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/rewrite/handler/package-summary.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6285, col 58
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/rewrite/handler/package-summary.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://nginx.org/en/docs/http/ngx_http_rewrite_module.html'
+Name       `Nginx rewrite module'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6264, col 189
+Real URL   https://nginx.org/en/docs/http/ngx_http_rewrite_module.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://httpd.apache.org/docs/current/mod/mod_rewrite.html'
+Name       `Apache’s mod_rewrite'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6264, col 86
+Real URL   https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://haproxy.org'
+Name       `HAProxy'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6113, col 24
+Real URL   https://haproxy.org
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc7233'
+Name       `Range requests'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 6090, col 4
+Real URL   https://tools.ietf.org/html/rfc7233
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol'
+Name       `Nginx'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5745, col 209
+Real URL   https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://cbonte.github.io/haproxy-dconv/2.2/configuration.html#5.2-send-proxy'
+Name       `HAProxy'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5745, col 66
+Real URL   http://cbonte.github.io/haproxy-dconv/2.2/configuration.html#5.2-send-proxy
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt'
+Name       `PROXY protocol'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5736, col 250
+Real URL   https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://boringssl.googlesource.com/boringssl/'
+Name       `BoringSSL'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5697, col 146
+Real URL   https://boringssl.googlesource.com/boringssl/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://github.com/google/conscrypt/'
+Name       `Conscrypt'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5697, col 66
+Real URL   https://github.com/google/conscrypt/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7838'
+Name       `HTTP alternate service'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5640, col 169
+Real URL   https://datatracker.ietf.org/doc/html/rfc7838
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/CustomRequestLog.html'
+Name       `CustomRequestLog javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5244, col 62
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/server/CustomRequestLog.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Common_Log_Format'
+Name       `NCSA Format'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5231, col 56
+Real URL   https://en.wikipedia.org/wiki/Common_Log_Format
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/CookieCompliance.html'
+Name       `CookieCompliance'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4961, col 56
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/CookieCompliance.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/CookieCompliance.Violation.html'
+Name       `CookieCompliance.Violation'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4958, col 8
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/CookieCompliance.Violation.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/UriCompliance.html'
+Name       `UriCompliance'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4927, col 56
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/UriCompliance.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/UriCompliance.Violation.html'
+Name       `UriCompliance.Violation'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4924, col 84
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/UriCompliance.Violation.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc3986'
+Name       `RFC 3986'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4896, col 39
+Real URL   https://datatracker.ietf.org/doc/html/rfc3986
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc2396'
+Name       `RFC 2396'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4893, col 79
+Real URL   https://datatracker.ietf.org/doc/html/rfc2396
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc1808'
+Name       `RFC 1808'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4890, col 193
+Real URL   https://datatracker.ietf.org/doc/html/rfc1808
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc1738'
+Name       `RFC 1738'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4890, col 77
+Real URL   https://datatracker.ietf.org/doc/html/rfc1738
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7540'
+Name       `RFC 7540'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4853, col 4
+Real URL   https://datatracker.ietf.org/doc/html/rfc7540
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7235'
+Name       `RFC 7235'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4850, col 354
+Real URL   https://datatracker.ietf.org/doc/html/rfc7235
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7234'
+Name       `RFC 7234'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4850, col 284
+Real URL   https://datatracker.ietf.org/doc/html/rfc7234
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7233'
+Name       `RFC 7233'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4850, col 214
+Real URL   https://datatracker.ietf.org/doc/html/rfc7233
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://openjdk.java.net/projects/jmc/'
+Name       `Java Mission Control'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13865, col 79
+Real URL   https://openjdk.java.net/projects/jmc/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7232'
+Name       `RFC 7232'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4850, col 144
+Real URL   https://datatracker.ietf.org/doc/html/rfc7232
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7231'
+Name       `RFC 7231'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4850, col 74
+Real URL   https://datatracker.ietf.org/doc/html/rfc7231
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc2616'
+Name       `RFC 2616'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4847, col 4
+Real URL   https://datatracker.ietf.org/doc/html/rfc2616
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc2068'
+Name       `RFC 2068'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4844, col 4
+Real URL   https://datatracker.ietf.org/doc/html/rfc2068
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://www.w3.org/Protocols/HTTP/AsImplemented.html'
+Name       `HTTP/0.9'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4836, col 117
+Real URL   https://www.w3.org/Protocols/HTTP/AsImplemented.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/HttpCompliance.html'
+Name       `HttpCompliance'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4831, col 433
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/HttpCompliance.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/HttpCompliance.Violation.html#CASE_INSENSITIVE_METHOD'
+Name       `HttpCompliance.Violation.CASE_INSENSITIVE_METHOD'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4831, col 230
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http/HttpCompliance.Violation.html#CASE_INSENSITIVE_METHOD
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.1'
+Name       `case sensitive'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4831, col 69
+Real URL   https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.1
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://en.wikipedia.org/wiki/Request_for_Comments'
+Name       `IETF RFC'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 4806, col 56
+Real URL   https://en.wikipedia.org/wiki/Request_for_Comments
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/websocket/client/WebSocketClient.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3695, col 47
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/websocket/client/WebSocketClient.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://localhost:8444/path'
+Name       `http://localhost:8444/path'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3467, col 307
+Real URL   http://localhost:8444/path
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Session.Client.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3440, col 58
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http3/api/Session.Client.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/Stream.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3016, col 50
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/Stream.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://localhost:8080/path'
+Name       `http://localhost:8080/path'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3003, col 307
+Real URL   http://localhost:8080/path
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/Session.Listener.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2976, col 51
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/http2/api/Session.Listener.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc7540#section-5.2'
+Name       `the specification'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2858, col 57
+Real URL   https://tools.ietf.org/html/rfc7540#section-5.2
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc7235'
+Name       `RFC 7235'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2217, col 135
+Real URL   https://tools.ietf.org/html/rfc7235
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc2965'
+Name       `RFC2965'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2179, col 134
+Real URL   https://tools.ietf.org/html/rfc2965
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc2109'
+Name       `RFC2109'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2179, col 58
+Real URL   https://tools.ietf.org/html/rfc2109
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://tools.ietf.org/html/rfc6265'
+Name       `RFC6265'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2176, col 28
+Real URL   https://tools.ietf.org/html/rfc6265
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/ssl/SslContextFactory.Client.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2072, col 62
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/util/ssl/SslContextFactory.Client.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/HttpClient.html'
+Name       `javadocs'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 1987, col 45
+Real URL   https://eclipse.dev/jetty/javadoc/jetty-10/org/eclipse/jetty/client/HttpClient.html
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://en.wikipedia.org/wiki/Post/Redirect/Get'
+Name       `POST/Redirect/GET'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 1547, col 113
+Real URL   http://en.wikipedia.org/wiki/Post/Redirect/Get
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://logging.apache.org/log4j/2.x/'
+Name       `Log4j2'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 14444, col 120
+Real URL   https://logging.apache.org/log4j/2.x/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://logback.qos.ch'
+Name       `LogBack'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 14444, col 72
+Real URL   http://logback.qos.ch
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `http://slf4j.org/'
+Name       `SLF4J'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 14430, col 53
+Real URL   http://slf4j.org/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `https://docs.oracle.com/en/java/javase/11/management/'
+Name       `the official JMX documentation'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 14079, col 82
+Real URL   https://docs.oracle.com/en/java/javase/11/management/
+Info       The URL is outside of the domain filter, checked only
+           syntax.
+Result     Valid: filtered
+
+URL        `./coderay-asciidoctor.css'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/coderay-asciidoctor.css
+Check time 0.735 seconds
+Size       1KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-4760564aad148998e116357e8f3a5450.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 1430, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-4760564aad148998e116357e8f3a5450.png
+Check time 0.709 seconds
+Size       23.92KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-136e615bb97d8356ceb17a851c86817a.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2224, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-136e615bb97d8356ceb17a851c86817a.png
+Check time 1.197 seconds
+Size       9KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-fada5fbf7628dc70c998680727a069bd.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3736, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-fada5fbf7628dc70c998680727a069bd.png
+Check time 1.683 seconds
+Size       26.85KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-e7fd1b7ba54e07262bd726c9fe979363.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 2409, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-e7fd1b7ba54e07262bd726c9fe979363.png
+Check time 2.079 seconds
+Size       20.78KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-1ed737fca2f0d63f7ebac20672a2e222.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 3790, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-1ed737fca2f0d63f7ebac20672a2e222.png
+Check time 2.772 seconds
+Size       28.84KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-05cfcead1245ff0fbcf3af8873998cee.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5016, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-05cfcead1245ff0fbcf3af8873998cee.png
+Check time 2.962 seconds
+Size       8KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-3ca149653ee220164efd33ca869b97b5.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5086, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-3ca149653ee220164efd33ca869b97b5.png
+Check time 3.134 seconds
+Size       17.13KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-24a0ef88281611e6f6ebbb9d395e2e68.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 5656, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-24a0ef88281611e6f6ebbb9d395e2e68.png
+Check time 3.597 seconds
+Size       9KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-ec0156d64fc9a225c5e022fc352d7d46.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 7751, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-ec0156d64fc9a225c5e022fc352d7d46.png
+Check time 3.948 seconds
+Size       26.83KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-fb3e088ea5480f2b172677334c79d51f.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8394, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-fb3e088ea5480f2b172677334c79d51f.png
+Check time 4.181 seconds
+Size       28.54KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-8bbf1fa0b84011383e811eaf9e630100.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8638, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-8bbf1fa0b84011383e811eaf9e630100.png
+Check time 4.281 seconds
+Size       8KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-ae4b86cecdafb2b8e1afb35b06f359a1.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 8876, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-ae4b86cecdafb2b8e1afb35b06f359a1.png
+Check time 4.198 seconds
+Size       8KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-3e23a5cd9673dbe358271d004cc0d714.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 9028, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-3e23a5cd9673dbe358271d004cc0d714.png
+Check time 4.063 seconds
+Size       10.99KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-d8ecf025f2e851a45b4d2132df024ecb.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10040, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-d8ecf025f2e851a45b4d2132df024ecb.png
+Check time 4.198 seconds
+Size       9KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-63a9fb2dbcfbcb3fb7bb1dffc2609836.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10084, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-63a9fb2dbcfbcb3fb7bb1dffc2609836.png
+Check time 4.120 seconds
+Size       17.30KB
+Result     Valid: 200 OK
+
+URL        `{DISTGUIDE}'
+Name       `distribution'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 10813, col 37
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/%7BDISTGUIDE%7D
+Check time 4.036 seconds
+Size       375B
+Result     Error: 404 Not Found
+
+URL        `images/diag-plantuml-md5-00328cb3d2df8187923760470ae4b579.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13147, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-00328cb3d2df8187923760470ae4b579.png
+Check time 4.168 seconds
+Size       4KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-624524d586ade94fb3c1aaff2ce724bc.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13164, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-624524d586ade94fb3c1aaff2ce724bc.png
+Check time 3.959 seconds
+Size       11.02KB
+Result     Valid: 200 OK
+
+URL        `images/diag-plantuml-md5-2186143f423f5fb7696a7e6e67d9a227.png'
+Name       `Diagram'
+Parent URL https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/index.html, line 13194, col 1
+Real URL   https://eclipse.dev/jetty/documentation/jetty-10/programming-guide/images/diag-plantuml-md5-2186143f423f5fb7696a7e6e67d9a227.png
+Check time 3.957 seconds
+Size       10.73KB
+Result     Valid: 200 OK
+
+Statistics:
+Downloaded: 901.34KB.
+Content types: 18 image, 4 text, 0 video, 0 audio, 0 application, 1 mail and 132 other.
+URL lengths: min=17, max=166, avg=74.
+
+That's it. 155 links in 155 URLs checked. 0 warnings found. 1 error found.
+Stopped checking at 2024-02-06 10:03:49-004 (10 seconds)

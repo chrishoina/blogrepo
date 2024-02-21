@@ -1,0 +1,14 @@
+# good reference https://konbert.com/blog/convert-json-to-csv-in-python3-using-pandas
+
+import json
+import pandas 
+
+with open('/Users/choina/Documents/blogrepo/ordsPython/random/2kme-evqq.json', encoding='utf-8') as file:
+    data = json.loads(file.read())
+
+df = pandas.json_normalize(data)
+
+# print(df)
+
+df.to_csv('rhc.csv', index=False, encoding='utf-8')
+
