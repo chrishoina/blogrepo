@@ -3,11 +3,11 @@ then(response => response.json())
 .then(data => {
     const list = data.items;
 
-    list.map((bobby) => {
-        const title = bobby.title;
-        const year = bobby.year;
-        const gross = bobby.gross; 
-        const cast =  bobby.cast;
+    list.map((item) => {
+        const title = item.title;
+        const year = item.year;
+        const gross = item.gross; 
+        const cast =  item.cast;
         const movieEntries = `<ul>
         <li><b>Movie Title:</b> ${title}</li>
         <li><b>Year Released:</b> ${year}</li>
