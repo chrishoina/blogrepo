@@ -1,0 +1,134 @@
+{
+  "items": [
+    {
+      "ename": "ADAMS",
+      "dname": "RESEARCH",
+      "job": "CLERK",
+      "empno": 7876,
+      "hiredate": "1987-05-23T00:00:00Z",
+      "loc": "DALLAS"
+    },
+    {
+      "ename": "ALLEN",
+      "dname": "SALES",
+      "job": "SALESMAN",
+      "empno": 7499,
+      "hiredate": "1981-02-20T00:00:00Z",
+      "loc": "CHICAGO"
+    },
+    {
+      "ename": "BLAKE",
+      "dname": "SALES",
+      "job": "MANAGER",
+      "empno": 7698,
+      "hiredate": "1981-05-01T00:00:00Z",
+      "loc": "CHICAGO"
+    },
+    {
+      "ename": "CLARK",
+      "dname": "ACCOUNTING",
+      "job": "MANAGER",
+      "empno": 7782,
+      "hiredate": "1981-06-09T00:00:00Z",
+      "loc": "NEW YORK"
+    },
+    {
+      "ename": "FORD",
+      "dname": "RESEARCH",
+      "job": "ANALYST",
+      "empno": 7902,
+      "hiredate": "1981-12-03T00:00:00Z",
+      "loc": "DALLAS"
+    },
+    {
+      "ename": "JAMES",
+      "dname": "SALES",
+      "job": "CLERK",
+      "empno": 7900,
+      "hiredate": "1981-12-03T00:00:00Z",
+      "loc": "CHICAGO"
+    },
+    {
+      "ename": "JONES",
+      "dname": "RESEARCH",
+      "job": "MANAGER",
+      "empno": 7566,
+      "hiredate": "1981-04-02T00:00:00Z",
+      "loc": "DALLAS"
+    },
+    {
+      "ename": "KING",
+      "dname": "ACCOUNTING",
+      "job": "PRESIDENT",
+      "empno": 7839,
+      "hiredate": "1981-11-17T00:00:00Z",
+      "loc": "NEW YORK"
+    },
+    {
+      "ename": "MARTIN",
+      "dname": "SALES",
+      "job": "SALESMAN",
+      "empno": 7654,
+      "hiredate": "1981-09-28T00:00:00Z",
+      "loc": "CHICAGO"
+    },
+    {
+      "ename": "MILLER",
+      "dname": "ACCOUNTING",
+      "job": "CLERK",
+      "empno": 7934,
+      "hiredate": "1982-01-23T00:00:00Z",
+      "loc": "NEW YORK"
+    },
+    {
+      "ename": "SCOTT",
+      "dname": "RESEARCH",
+      "job": "ANALYST",
+      "empno": 7788,
+      "hiredate": "1987-04-19T00:00:00Z",
+      "loc": "DALLAS"
+    },
+    {
+      "ename": "SMITH",
+      "dname": "RESEARCH",
+      "job": "CLERK",
+      "empno": 7369,
+      "hiredate": "1980-12-17T00:00:00Z",
+      "loc": "DALLAS"
+    },
+    {
+      "ename": "TURNER",
+      "dname": "SALES",
+      "job": "SALESMAN",
+      "empno": 7844,
+      "hiredate": "1981-09-08T00:00:00Z",
+      "loc": "CHICAGO"
+    },
+    {
+      "ename": "WARD",
+      "dname": "SALES",
+      "job": "SALESMAN",
+      "empno": 7521,
+      "hiredate": "1981-02-22T00:00:00Z",
+      "loc": "CHICAGO"
+    }
+  ],
+  "hasMore": false,
+  "limit": 25,
+  "offset": 0,
+  "count": 14,
+  "links": [
+    {
+      "rel": "self",
+      "href": "http://localhost:8080/ords/ordstest/api/example/api/"
+    },
+    {
+      "rel": "describedby",
+      "href": "http://localhost:8080/ords/ordstest/metadata-catalog/api/example/api/"
+    },
+    {
+      "rel": "first",
+      "href": "http://localhost:8080/ords/ordstest/api/example/api/"
+    }
+  ]
+}

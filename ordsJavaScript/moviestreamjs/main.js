@@ -1,4 +1,5 @@
-fetch("https://gf641ea24ecc468-moviestream.adb.us-ashburn-1.oraclecloudapps.com/ords/admin/moviestream/summarydetails", {"method":"GET"}).
+fetch('https://gf641ea24ecc468-moviestream23ai.adb.us-ashburn-1.oraclecloudapps.com/ords/admin/movie/'
+, {"method":"GET"}).
 then(response => response.json()) 
 .then(data => {
     const list = data.items;
