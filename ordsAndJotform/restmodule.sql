@@ -20,70 +20,6 @@ BEGIN
 
   ORDS.DEFINE_TEMPLATE(
       p_module_name    => 'ords_and_jotform',
-      p_pattern        => 'jotform_varchar2s',
-      p_priority       => 0,
-      p_etag_type      => 'HASH',
-      p_etag_query     => NULL,
-      p_comments       => NULL);
-
-  ORDS.DEFINE_HANDLER(
-      p_module_name    => 'ords_and_jotform',
-      p_pattern        => 'jotform_varchar2s',
-      p_method         => 'POST',
-      p_source_type    => 'plsql/block',
-      p_mimes_allowed  => NULL,
-      p_comments       => NULL,
-      p_source         => 
-'DECLARE
-    incoming_payload CLOB;
-BEGIN
-    incoming_payload := :body_json;
-    INSERT INTO JOTFORM_VARCHAR2S values(
-        JSON_VALUE(incoming_payload, ''$.type''),
-        JSON_VALUE(incoming_payload, ''$.ip''),
-        JSON_VALUE(incoming_payload, ''$.formTitle''),
-        JSON_VALUE(incoming_payload, ''$.webhookURL''),
-        JSON_VALUE(incoming_payload, ''$.rawRequest''),
-        JSON_VALUE(incoming_payload, ''$.submissionID''),
-        JSON_VALUE(incoming_payload, ''$.username''),
-        JSON_VALUE(incoming_payload, ''$.formID''),
-        JSON_VALUE(incoming_payload, ''$.pretty'')
-    );
-END;');
-
-  ORDS.DEFINE_TEMPLATE(
-      p_module_name    => 'ords_and_jotform',
-      p_pattern        => 'jotform_clobs',
-      p_priority       => 0,
-      p_etag_type      => 'HASH',
-      p_etag_query     => NULL,
-      p_comments       => NULL);
-
-  ORDS.DEFINE_HANDLER(
-      p_module_name    => 'ords_and_jotform',
-      p_pattern        => 'jotform_clobs',
-      p_method         => 'POST',
-      p_source_type    => 'plsql/block',
-      p_mimes_allowed  => NULL,
-      p_comments       => NULL,
-      p_source         => 
-'DECLARE
-BEGIN
-    INSERT INTO JOTFORM_CLOBS values(
-        :type,
-        :ip,
-        :formTitle,
-        :webhookURL,
-        :rawRequest,
-        :submissionID,
-        :username,
-        :formID,
-        :pretty
-    );
-END;');
-
-  ORDS.DEFINE_TEMPLATE(
-      p_module_name    => 'ords_and_jotform',
       p_pattern        => 'jotform_data',
       p_priority       => 0,
       p_etag_type      => 'HASH',
@@ -99,7 +35,11 @@ END;');
       p_mimes_allowed  => NULL,
       p_comments       => NULL,
       p_source         => 
-'DECLARE
+'
+-- The :content_type implicit bind parameter would "map" to the CONTENT_TYPE column in the 
+-- JOTFORM_DATA table, while incoming_payload would map to the PAYLOAD column. 
+
+DECLARE
     incoming_payload CLOB;
 BEGIN
     incoming_payload := :body_json;
