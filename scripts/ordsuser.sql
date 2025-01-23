@@ -1,8 +1,8 @@
 INPUT
 PROMPT Choose a new database username:
-ACCEPT NEWUSER CHAR PROMPT 'Enter new user name hurrr:'
+ACCEPT NEWUSER CHAR PROMPT 'Enter new user name here:'
 PROMPT Choose a temporary password for &&NEWUSER: 
-ACCEPT NEWPASS CHAR PROMPT 'Make it super secret:'
+ACCEPT NEWPASS CHAR PROMPT 'Select a password that conforms to ORDS security guidelines:'
 
 /*
 I wish I could figure out a way to ONLY ask for username > check that against existing database users > AND THEN allow a user to continue with the 'choose password' step. I was only able to figure out how to ask for the username and password AND THEN checks against the database. I stole the code from this thread: https://stackoverflow.com/questions/30710990/creating-an-oracle-user-if-it-doesnt-already-exist 
@@ -52,4 +52,4 @@ PROMPT Not only that, &&NEWUSER can log into Database Actions and REST-Enable th
 PROMPT
 PROMPT
 PROMPT Click RETURN to return to the SQLcl prompt. And NEVER forget:
-PAUSE "You're good enough, you're smart enough, and doggone it, people like you!"
+PAUSE "Unless you see any compilation errors, the user you've created can now access Database actions at host:port/ords. On ORDS Standalone this would look something like https://localhost:8443/ords http://localhost:8080/ords or  !"
