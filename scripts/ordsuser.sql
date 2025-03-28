@@ -32,10 +32,10 @@ Begin
   Execute Immediate 'Grant Resource To &&NEWUSER';
   Execute Immediate 'Grant Unlimited Tablespace To &&NEWUSER';
   plsql_block := 'Begin ORDS_ADMIN.ENABLE_SCHEMA(p_schema => :1); Commit; End;';
-  Execute Immediate plsql_block using NEWUSER;
+  Execute Immediate plsql_block using '&&NEWUSER';
   End If;
 End;
-/
+
 
 /*
 The p_schema parameter is mandatory, that's why I'm including it. If you omit the other parameters, the procedure will use the default parameter values. 
