@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+// I mentioned this in the blog, but "items" and "links" will be an array of your results set. Those arrays will contain
+// one or more JSON objects. They can be nested as well. A reminder, that your custom-ORDS APIs and the Auto-REST enabled APIs
+// will look a little different. They WILL however all still have the same "top-level" properties, as you see in this block below.
+
 type Response struct {
 	Items   []Items `json:"items"`
 	Hasmore bool    `json:"hasMore"`
@@ -44,6 +48,9 @@ func main() {
 	var responseObject Response
 	json.Unmarshal(responseData, &responseObject)
 
+	// These code blocks should in no way be considered a "best practice." If you are coming from Go, then you are light years
+	// ahead of me. Consider this more of a template for working with a fairly standard ORDS API. Have fun!
+
 	for i := 0; i < len(responseObject.Items); i++ {
 		fmt.Println(responseObject.Items[i].Genre)
 	}
@@ -54,7 +61,7 @@ func main() {
 	fmt.Println(responseObject.Count)
 
 	for i := 0; i < len(responseObject.Links); i++ {
-		fmt.Println(responseObject.Links[i].Rel + responseObject.Links[i].Href)
+		fmt.Println("Link for " + responseObject.Links[i].Rel + ": " + responseObject.Links[i].Href)
 	}
 
 }
