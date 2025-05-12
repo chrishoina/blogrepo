@@ -774,4 +774,9 @@ You will see the following output:
 Server running at http://localhost:3000
 ```
 
-Click the link to be take to the `Index.html` page. Click the <kbd>Login</kbd> button. You will be temporary redirected to the OCI IAM 
+Click the link to be take to the `Index.html` page. Click the <kbd>Login</kbd> button. You will be temporary redirected to the OCI IAM Sign In page. Sign in with the following credentials:
+
+- **User Name:** `alhpauser`
+- **Password:** `[Password selected upon creating the alphauser]`
+
+Once you have signed in, you will be redirected to the sample application. The results of the ORDS `GET` request will be displayed on screen: `You are authorized to view this ALPHA group resource.`
