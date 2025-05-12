@@ -27,7 +27,7 @@ loginButton.addEventListener('click', () => {
 
   if (!code) return;
 
-  // Using this Authorization code, to retrieve a JWT from IAM.
+  // Using this Authorization code, to retrieve a JWT from the IAM /oauth2/v1/token endpoint.
   const response = await fetch('/exchange_token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -40,26 +40,33 @@ loginButton.addEventListener('click', () => {
     console.log("Token exchange error:\n" + tokenData);
   } else {
 
-    // You have the JWT. Next you'll issue a GET requst to the ORDS endpoint.
+    // A GET request is issued to the ORDS endpoint via the Server.js backend.
     const accessToken = tokenData.access_token;
 
     const ordsInfo = await fetch('/to_ords', {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(r => r.json());
 
-    // With the response in hand, do what you like with it. In this case, we've 
-    // added some fancy styling to remove the login button, as we display on the screen
+    // With the response in hand, we display on the screen
     // the results of the GET request.
 
     const textOnScreen = document.createElement('p');
-          textOnScreen.textContent = `${ordsInfo.data}`;
-
-          document.body.appendChild(textOnScreen);
-
-          if (loginButton) {
-            loginButton.classList.add('fade-out');
-            setTimeout(() => loginButton.remove(), 500);
-          }
+      textOnScreen.textContent = `${ordsInfo.data}`;
+      document.body.appendChild(textOnScreen);
+      
+      if (loginButton) {
+        loginButton.classList.add('fade-out');
+        setTimeout(() => loginButton.remove(), 500);
+      };
+    
+    // const backButton = document.createElement('button');
+    // backButton.textContent = 'Back to Home';
+    // backButton.style.marginTop = '1rem';
+    // backButton.addEventListener('click', () => {
+    //   window.location.href = '/';
+    // });
+    // document.body.appendChild(backButton);
+    
   
     // output.textContent = JSON.stringify(userInfo.data, null, 2);
     // window.history.replaceState({}, document.title, "/");
