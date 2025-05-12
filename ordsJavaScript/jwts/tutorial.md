@@ -774,4 +774,4 @@ You will see the following output:
 Server running at http://localhost:3000
 ```
 
-Click the link to be take to the `Index.html` page. Click the <kbd>Login</kbd>.
+Click the link to be take to the `Index.html` page. Click the <kbd>Login</kbd> button. You will be temporary redirected to the OCI IAM 
