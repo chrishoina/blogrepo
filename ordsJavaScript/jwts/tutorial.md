@@ -4,8 +4,6 @@
 
 ![Roles based ORDS js app demo gif](./blogimages/9-roles-based-with-iam-groups-white-background.gif " ")
 
-![Roles based ORDS js app demo gif](./blogimages/10-roles-based-with-iam-groups-transparent-background.gif " ")
-
 This tutorial demonstrates using Roles-Based Access Control (RBAC) claims in an Oracle Cloud Infrastructure (OCI) Identity and Access Management (IAM) JSON Web Token (JWT) to access Oracle REST Data Services (ORDS) protected resources (i.e., API endpoints).
 
 In his tutorial, we rely on OCI IAM JWTs. Other third-party Identity Providers may differ in their workflows, but there is likely to be considerable overlap and valuable information contained here.  
@@ -20,8 +18,8 @@ This tutorial provides steps for testing and experimenting with two different us
 ORDS JWT Profiles can be scope-based or role-based. This tutorial demonstrates using an Integrated Application's Groups and users therein as the basis for Role-Based Access. You may optionally use custom User Attributes as the basis for your custom claims, but this is outside the scope of this tutorial.
 
 > **About:** [ORDS JWT profiles](https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-1E914685-2E05-4380-955D-F8232815E365)
-
-< **Note:** Helpful resources are provided at the end of this tutorial.
+>
+> **Note:** Helpful resources are provided at the end of this tutorial.
 
 ### Prerequisites
 
@@ -82,7 +80,7 @@ You will need to create and configure two Integrated Applications in your Identi
    1. `ords-jwt-demo-app`
    2. `manage-claims-app`
 
-##### <code>ords-jwt-demo-app</code> configuration
+##### Configuring the <code>ords-jwt-demo-app</code> application
 
 This `ords-jwt-demo-app` is a Confidential Application type. The Resource server and Client configuration settings used for this Integrated Application are included for your reference. You may copy these settings to better follow along.
 
@@ -119,7 +117,7 @@ In a later section, you will see how these users are mapped to ORDS Roles. Those
 
 You may map your Identity Domain Groups to an ORDS Privilege *or* and an ORDS Role. For finer-grain control, mapping to an ORDS Role is recommended. This method allows you to add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
 
-##### <code>manage-claims-app</code> configuration
+##### Configuring the <code>manage-claims-app</code> application
 
 You must update the claims in your Identity Domain to include user-created custom claims. Adding these claims will ensure they are included in the JWTs from your Identity Domain.  
 
@@ -135,7 +133,7 @@ https://<domainURL>/admin/v1/CustomClaims/
 
 > **Note:** Remove embedded comments in the above JSON object prior to using in your `POST` request.
 
-###### Payload to include in your `POST` request
+###### Example payload included in your `POST` request
 
 ```json
 {
