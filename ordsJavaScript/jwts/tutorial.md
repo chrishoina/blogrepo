@@ -2,6 +2,19 @@
 
 ## Intro
 
+This tutorial will demonstrate using Roles Based Access Control Claims of a JSON Web Token (JWT) to access Oracle REST Data Services (ORDS) protected resources (i.e. API endpoints).
+
+We rely on Oracle Identity and Access Management (OCI IAM) JSON Web Tokens (JWTs) in his tutorial. Other third party Identity Providers may differ in their workflows, but there is likely to be overlap and valuable information contained here.  
+
+This tutorial provides steps for testing and experimenting with two different use cases:
+
+- an API testing tool example (in this example we use Insomnia; an alternative to Postman)
+- a sample JavaScript single page web application (using Node.js and Express.js)
+
+ORDS JWT Profiles can be Scope Based, or Role Based. This tutorial demonstrates using an Integrated Application's Groups, and users therein, as the basis for Roles-Based Access. You may optionally use custom User Attributes as the basis for your custom claims; but this is outside the scope of this tutorial.
+
+Helpful resources are provided at the end of this tutorial.
+
 ### Prerequisites
 
 1. An existing Identity Domain  
@@ -20,7 +33,7 @@
 
 3. An existing 25.1 or greater ORDS installation
 
-   - You must configure the following to reproduce this demonstration:
+   - You must configure the following to reproduce this demonstration (scripts are provided within this tutorial):
 
        1. ORDS Roles and Privileges
        2. ORDS JWT Profile
@@ -33,12 +46,12 @@
 
 5. An Integrated Development Environment capable of installing the required project dependencies via NPM
 
-   - You will need to following packages to reproduce this demonstration:
+   - You will need the following packages to follow along:
      - `dotenv`
      - `express`
      - `node-fetch`
 
-   - From within your project root folder, install these packages from the command line with the following command:
+   - From within your project root folder, install these packages with the following command:
 
         ```sh
         npm install express dotenv node-fetch
@@ -46,7 +59,7 @@
 
 ### Configuration
 
-Configuration will be required in three areas:
+Additional configuration will be required in three areas:
 
   1. Identity Domain
   2. ORDS
@@ -54,14 +67,14 @@ Configuration will be required in three areas:
 
 #### Identity Domain
 
-You will need to create and configure two Integrated Applications in your Identity Domain. In this example the two Integrated Applications are:
+You will need to create and configure two Integrated Applications in your Identity Domain. In this example we use:
 
    1. `ords-jwt-demo-app`
    2. `manage-claims-app`
 
 ##### <code>ords-jwt-demo-app</code> configuration
 
-This `ords-jwt-demo-app` is a Confidential Application type. The Resource server and Client configuration settings used for this Integrated Application are included for your reference. You may emulate these settings to better understand the demonstration.
+This `ords-jwt-demo-app` is a Confidential Application type. The Resource server and Client configuration settings used for this Integrated Application are included for your reference. You may copy these settings to better follow along.
 
 ###### Resource server configuration
 
@@ -78,17 +91,31 @@ This `ords-jwt-demo-app` is a Confidential Application type. The Resource server
 - **Client IP address:** `Anywhere`
 - **Token issuance policy: Authorized resources:** `All`
 
+> **NOTE:** We use the Authorization code grant type, others are included for convenience.
+
 ###### Groups
 
-The `ords-jwt-demo-app` will have two Groups, an `alphagroup` and `betagroup`. For demonstration purpose, each group will have two users: `alphauser` and `betauser`. In a later section, you will see how these users are mapped to ORDS Roles. Those Roles will then be assigned to ORDS Privileges. And those together will be used when validating the OCI IAM JSON Web Token.
+The `ords-jwt-demo-app` has two Groups:
 
-You may map your Identity Domain Groups to an ORDS Privilege *or* and ORDS Role. For finer grain control, mapping to an ORDS Role is recommended. This method allows to you add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than the Privilege.
+- `alphagroup`
+- `betagroup`
+
+For demonstration purpose, each group will have two users:
+
+- `alphauser`
+- `betauser`
+
+In a later section, you will see how these users are mapped to ORDS Roles. Those Roles will then be assigned to ORDS Privileges. And those together will be used when validating the OCI IAM JSON Web Token.
+
+You may map your Identity Domain Groups to an ORDS Privilege *or* and ORDS Role. For finer grain control, mapping to an ORDS Role is recommended. This method allows to you add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
 
 ##### <code>manage-claims-app</code> configuration
 
-You must update the claims in your Identity Domain to include user-created custom claims. Adding these claims will ensure they are automatically added to any JWTs from your Identity Domain.  
+You must update the claims in your Identity Domain to include user-created custom claims. Adding these claims will ensure they are included in the JWTs from your Identity Domain.  
 
-You must configure a separate *administative* Integrated Application (in this example the `manage-claims-app` application) to complete this task. After completing the steps in [this tutorial](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/Content/Identity/api-getstarted/OATOAuthClientWebApp.htm), you will be issued an Access Token. You will use this token to update your Identity Domain's claims to include a new Custom Claim.
+You must configure a separate *administative* Integrated Application (in this example the `manage-claims-app` application) to complete this task. After completing the steps in [this tutorial](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/Content/Identity/api-getstarted/OATOAuthClientWebApp.htm), you will be issued an Access Token. You will then use this token to update your Identity Domain's claims to include a new Custom Claim.
+
+Using the Access Token acquired from the tutorial, subimt a `POST` request to the `/admin/v1/CustomClaims/` endpoint.
 
 ###### Your Custom Claim domain
 
@@ -121,9 +148,11 @@ https://<domainURL>/admin/v1/CustomClaims/
 
 ###### Sample `curl` command
 
+An example cURL command to your `/admin/v1/CustomClaims/` endpoint (in our demo we perform this in the Insomnia API testing application).
+
 ```sh
 curl --request POST \
-  --url https://idcs-66de820ed85f41f0805119c5967689b2.identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
+  --url https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
   --header 'Authorization: Bearer [Your Access Token]' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -142,21 +171,23 @@ curl --request POST \
 }'
 ```
 
-You will recieve an `HTTP/1.1 201 Created` response after your POST has completed. You may also issue a subsequent `GET` request to the same endpoint to review these changes.
+You will recieve an `HTTP/1.1 201 Created` response after your `POST` request is complete. You may also issue a subsequent `GET` request to the same endpoint to review these changes.
 
 ###### Example `GET` request
 
 ```sh
 curl --request GET \
-  --url https://idcs-66de820ed85f41f0805119c5967689b2.identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
+  --url https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
   --header 'Authorization: Bearer [Your Access Token]' \
 ```
 
-With this configuration complete, you will now configure your ORDS Resource Module, JWT Profile, Roles, and Privileges.
+With this configuration complete, we can now configure the ORDS Resource Modules, JWT Profile, Roles, and Privileges.
 
 #### ORDS
 
-The following configuration settings maybe be used to emulate this demonstration. It is assumed you have an existing REST-enabled schema. 
+You can use the following definitions to simulate this demonstration.
+
+> **NOTE:** It is assumed you have an existing REST-enabled schema.
 
 ##### Resource Module
 
@@ -525,18 +556,28 @@ loginButton.addEventListener('click', () => {
     // With the response in hand, we display on the screen
     // the results of the GET request.
 
-    const textOnScreen = document.createElement('p');
-          textOnScreen.textContent = `${ordsInfo.data}`;
+    const dbActual = document.createElement('p');
+    const crtUsr = document.createElement('p');
+    dbActual.innerHTML = `The current <code>SYSTIMESTAMP</code> for your database server is: <code>${ordsInfo.dbActual}</code>`;
+    crtUsr.innerHTML = `You are currently logged in as the following user: <code>${ordsInfo.crtUser}</code>`
+    document.body.appendChild(dbActual);
+    document.body.appendChild(crtUsr);
 
-          document.body.appendChild(textOnScreen);
-
-          if (loginButton) {
-            loginButton.classList.add('fade-out');
-            setTimeout(() => loginButton.remove(), 500);
-          }
-  
-    // output.textContent = JSON.stringify(userInfo.data, null, 2);
-    // window.history.replaceState({}, document.title, "/");
+      
+      if (loginButton) {
+        loginButton.classList.add('fade-out');
+        setTimeout(() => loginButton.remove(), 500);
+      };
+    
+    const backButton = document.createElement('button');
+    backButton.textContent = 'Home';
+    backButton.style.color = 'blue'
+    backButton.style.marginTop = '1rem';
+    backButton.addEventListener('click', () => {
+      window.location.href = '/';
+    });
+    document.body.appendChild(backButton);
+    
   };
 })();
 ```
@@ -680,7 +721,7 @@ app.listen(PORT, () => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Oracle IAM OAuth2 SPA</title>
+  <title>ORDS and RBAC JWTs</title>
   <style>
     #login.fade-out {
       transition: opacity 0.5s ease;
@@ -689,8 +730,8 @@ app.listen(PORT, () => {
   </style>
 </head>
 <body>
-  <h1>Login with Oracle IAM</h1>
-  <button id="login">Login</button>
+  <h3 style="color: darkslategray">Demo: ORDS Roles-Based Access Claims (RBAC) and OCI Identity and Access Management JSON Web Tokens (JWTs)</h3>
+  <button style="color: blue" id="login">Login as IAM user</button>
   <script type="module" src="app.js"></script>
 </body>
 </html>
@@ -698,7 +739,7 @@ app.listen(PORT, () => {
 
 ###### .ENV
 
-```txt
+```bash
 CLIENT_ID=
 CLIENT_SECRET=
 TENANT_URL=
@@ -737,6 +778,7 @@ npm install express dotenv node-fetch
 
 You must configure your `.env` file to match your development and OCI IAM settings. You should replace the following:
 
+```bash
 CLIENT_ID=[Your Integrated Application Client ID]
 CLIENT_SECRET=[Your Integrated Application Client Secret]
 TENANT_URL=https://idcs-[Your unique Tenant Identifier].identity.oraclecloud.com:443
@@ -744,6 +786,7 @@ REDIRECT_URI=http://localhost:3000/callback
 AUTH_ENDPOINT=https://idcs-[Your unique Tenant Identifier].identity.oraclecloud.com:443/oauth2/v1/authorize
 TOKEN_ENDPOINT=https://idcs-[Your unique Tenant Identifier].identity.oraclecloud.com:443/oauth2/v1/token
 ORDS_ENDPOINT=http://localhost:8080/ords/ordsdemo/jwtdemoalpha/alpha_group
+```
 
 > **NOTE:** Your ORDS endpoint may differ depending on your installation and deployment.
 
@@ -774,9 +817,52 @@ You will see the following output:
 Server running at http://localhost:3000
 ```
 
-Click the link to be take to the `Index.html` page. Click the <kbd>Login</kbd> button. You will be temporary redirected to the OCI IAM Sign In page. Sign in with the following credentials:
+Click the link in your terminal to open the app's `Index.html` page. Click the <button>Login as IAM User</button> button. You will be temporary redirected to the OCI IAM Sign In page. Sign in with the following credentials:
 
-- **User Name:** `alhpauser`
+- **User Name:** `alphauser`
 - **Password:** `[Password selected upon creating the alphauser]`
 
-Once you have signed in, you will be redirected to the sample application. The results of the ORDS `GET` request will be displayed on screen: `You are authorized to view this ALPHA group resource.`
+Once you have signed in, you will be redirected to the sample application. The results of the ORDS `GET` request will be displayed on screen:
+
+```bash
+The current SYSTIMESTAMP for your database server is: 13-MAY-25 06.55.23.452414 PM +00:00
+
+You are currently logged in as the following user: alphauser
+```
+
+If you clear your browser's cache and press the <button>Login as IAM User</button> again, you'll be redirected to the OCI IAM Sign In page. Sign in as the `betauser` and you will be redirected back to the sample application. Both fields will return the following message:
+
+```bash
+The current SYSTIMESTAMP for your database server is: undefined
+
+You are currently logged in as the following user: undefined
+```
+
+The application will have recieved a valid JWT. But decoding it would reveal the following Custom Claim:
+
+```json
+{...
+"iam_groups": [ "betagroup" ]
+...}
+```
+
+Since the `/ordsdemo/alpha_v1/alpha_group` endpoint is protected by the `alphagroup` role. Since the `alphagroup` privilege does not include the `betagroup` role, this `betauser` cannot access this end point.
+
+### Wrap-up
+
+By now, you should have a better understanding of how to:
+
+1. Create a custom claim from a Group in your Identity Domain's Integrated Application
+2. Protect ORDS with a role that matches the custom claim and create the requisite JWT Profile
+3. Navigate an OAuth2.0 Authorization Code grant type (for acquiring an OCI IAM JWT) two ways:
+   - `cURL`
+   - Single-page JavaScript web application using `Node.js` and `Express.js`
+
+### Resources
+
+The following are helpful resources when working with ORDS and JWTs
+
+- [ORDS and JWT docs](https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-B1ED4DFD-9DD4-4FBF-B91D-35373D756538) (ORDS Developer's Guide)
+- [Configuring OCI IAM JWTs and ORDS for Scope Based Access Control (SBAC) claims](https://followthecoffee.com/configuring-oci-iam-domain-jwts-to-use-with-ords/) (Blog)
+- [MicroSoft Entra JWTS with ORDS SBAC claims](https://followthecoffee.com/ords-apis-and-microsoft-entra-jwts-tutorial/) (Blog)
+- [ORDS Troubleshooting a 401 invalid_token response](https://followthecoffee.com/401-unauthorized-invalid_token-troubleshooting-oracle-cloud-iam-jwts-with-ords/) (Blog)

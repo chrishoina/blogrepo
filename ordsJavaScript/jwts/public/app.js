@@ -50,25 +50,27 @@ loginButton.addEventListener('click', () => {
     // With the response in hand, we display on the screen
     // the results of the GET request.
 
-    const textOnScreen = document.createElement('p');
-      textOnScreen.textContent = `${ordsInfo.data}`;
-      document.body.appendChild(textOnScreen);
+    const dbActual = document.createElement('p');
+    const crtUsr = document.createElement('p');
+    dbActual.innerHTML = `The current <code>SYSTIMESTAMP</code> for your database server is: <code>${ordsInfo.dbActual}</code>`;
+    crtUsr.innerHTML = `You are currently logged in as the following user: <code>${ordsInfo.crtUser}</code>`
+    document.body.appendChild(dbActual);
+    document.body.appendChild(crtUsr);
+
       
       if (loginButton) {
         loginButton.classList.add('fade-out');
         setTimeout(() => loginButton.remove(), 500);
       };
     
-    // const backButton = document.createElement('button');
-    // backButton.textContent = 'Back to Home';
-    // backButton.style.marginTop = '1rem';
-    // backButton.addEventListener('click', () => {
-    //   window.location.href = '/';
-    // });
-    // document.body.appendChild(backButton);
+    const backButton = document.createElement('button');
+    backButton.textContent = 'Home';
+    backButton.style.color = 'blue'
+    backButton.style.marginTop = '1rem';
+    backButton.addEventListener('click', () => {
+      window.location.href = '/';
+    });
+    document.body.appendChild(backButton);
     
-  
-    // output.textContent = JSON.stringify(userInfo.data, null, 2);
-    // window.history.replaceState({}, document.title, "/");
   };
 })();
