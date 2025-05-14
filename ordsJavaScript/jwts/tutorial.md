@@ -2,16 +2,16 @@
 
 ## Intro
 
-This tutorial will demonstrate using Roles Based Access Control Claims of a JSON Web Token (JWT) to access Oracle REST Data Services (ORDS) protected resources (i.e. API endpoints).
+This tutorial will demonstrate using Roles-Based Access Control Claims of a JSON Web Token (JWT) to access Oracle REST Data Services (ORDS) protected resources (i.e., API endpoints).
 
-We rely on Oracle Identity and Access Management (OCI IAM) JSON Web Tokens (JWTs) in his tutorial. Other third party Identity Providers may differ in their workflows, but there is likely to be overlap and valuable information contained here.  
+In his tutorial, we rely on Oracle Identity and Access Management (OCI IAM) JSON Web Tokens (JWTs). Other third-party Identity Providers may differ in their workflows, but there is likely to be overlap and valuable information contained here.  
 
 This tutorial provides steps for testing and experimenting with two different use cases:
 
-- an API testing tool example (in this example we use Insomnia; an alternative to Postman)
-- a sample JavaScript single page web application (using Node.js and Express.js)
+- an API testing tool example (in this example, we use Insomnia, an alternative to Postman)
+- a sample JavaScript single-page web application (using Node.js and Express.js)
 
-ORDS JWT Profiles can be Scope Based, or Role Based. This tutorial demonstrates using an Integrated Application's Groups, and users therein, as the basis for Roles-Based Access. You may optionally use custom User Attributes as the basis for your custom claims; but this is outside the scope of this tutorial.
+ORDS JWT Profiles can be scope-based or role-based. This tutorial demonstrates using an Integrated Application's Groups and users therein as the basis for Role-Based Access. You may optionally use custom User Attributes as the basis for your custom claims, but this is outside the scope of this tutorial.
 
 Helpful resources are provided at the end of this tutorial.
 
@@ -21,7 +21,7 @@ Helpful resources are provided at the end of this tutorial.
 
    - This Domain should have the **Configure client access** Domain Setting enabled.  
 
-     You can enable this setting from within your Identity Domain's dashboard by navigating to **Settings**, locating the **Access signing certificate**, and verifying the **Configure client access** Check Box is checked.
+     You can enable this setting from within your Identity Domain's dashboard by navigating to **Settings**, locating the **Access signing certificate**, and verifying that the **Configure client access** Check Box is checked.
 
 2. Integrated Applications
 
@@ -67,7 +67,7 @@ Additional configuration will be required in three areas:
 
 #### Identity Domain
 
-You will need to create and configure two Integrated Applications in your Identity Domain. In this example we use:
+You will need to create and configure two Integrated Applications in your Identity Domain. In this example, we use:
 
    1. `ords-jwt-demo-app`
    2. `manage-claims-app`
@@ -91,7 +91,7 @@ This `ords-jwt-demo-app` is a Confidential Application type. The Resource server
 - **Client IP address:** `Anywhere`
 - **Token issuance policy: Authorized resources:** `All`
 
-> **NOTE:** We use the Authorization code grant type, others are included for convenience.
+> **NOTE:** We use the Authorization code grant type; others are included for convenience.
 
 ###### Groups
 
@@ -100,22 +100,22 @@ The `ords-jwt-demo-app` has two Groups:
 - `alphagroup`
 - `betagroup`
 
-For demonstration purpose, each group will have two users:
+For demonstration purposes, each group will have two users:
 
 - `alphauser`
 - `betauser`
 
-In a later section, you will see how these users are mapped to ORDS Roles. Those Roles will then be assigned to ORDS Privileges. And those together will be used when validating the OCI IAM JSON Web Token.
+In a later section, you will see how these users are mapped to ORDS Roles. Those Roles will then be assigned to ORDS Privileges, which will be used when validating the OCI IAM JSON Web Token.
 
-You may map your Identity Domain Groups to an ORDS Privilege *or* and ORDS Role. For finer grain control, mapping to an ORDS Role is recommended. This method allows to you add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
+You may map your Identity Domain Groups to an ORDS Privilege *or* and an ORDS Role. For finer-grain control, mapping to an ORDS Role is recommended. This method allows you to add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
 
 ##### <code>manage-claims-app</code> configuration
 
 You must update the claims in your Identity Domain to include user-created custom claims. Adding these claims will ensure they are included in the JWTs from your Identity Domain.  
 
-You must configure a separate *administative* Integrated Application (in this example the `manage-claims-app` application) to complete this task. After completing the steps in [this tutorial](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/Content/Identity/api-getstarted/OATOAuthClientWebApp.htm), you will be issued an Access Token. You will then use this token to update your Identity Domain's claims to include a new Custom Claim.
+You must configure a separate *administrative* Integrated Application (in this example, the `manage-claims-app` application) to complete this task. After completing the steps in [this tutorial](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/Content/Identity/api-getstarted/OATOAuthClientWebApp.htm), you will be issued an Access Token. You will then use this token to update your Identity Domain's claims to include a new Custom Claim.
 
-Using the Access Token acquired from the tutorial, subimt a `POST` request to the `/admin/v1/CustomClaims/` endpoint.
+Using the Access Token acquired from the tutorial, submit a `POST` request to the `/admin/v1/CustomClaims/` endpoint.
 
 ###### Your Custom Claim domain
 
@@ -148,7 +148,7 @@ https://<domainURL>/admin/v1/CustomClaims/
 
 ###### Sample `curl` command
 
-An example cURL command to your `/admin/v1/CustomClaims/` endpoint (in our demo we perform this in the Insomnia API testing application).
+An example cURL command to your `/admin/v1/CustomClaims/` endpoint (in our demo, we perform this in the Insomnia API testing application).
 
 ```sh
 curl --request POST \
@@ -171,7 +171,7 @@ curl --request POST \
 }'
 ```
 
-You will recieve an `HTTP/1.1 201 Created` response after your `POST` request is complete. You may also issue a subsequent `GET` request to the same endpoint to review these changes.
+You will receive an `HTTP/1.1 201 Created` response after your `POST` request is complete. You may also issue a subsequent `GET` request to the same endpoint to review these changes.
 
 ###### Example `GET` request
 
@@ -181,7 +181,7 @@ curl --request GET \
   --header 'Authorization: Bearer [Your Access Token]' \
 ```
 
-With this configuration complete, we can now configure the ORDS Resource Modules, JWT Profile, Roles, and Privileges.
+With the configuration complete, we can configure the ORDS Resource Modules, JWT Profile, Roles, and Privileges.
 
 #### ORDS
 
@@ -386,14 +386,14 @@ Each role is then assigned to an ORDS Privilege. You will now have the following
 
 ##### JWT Profile
 
-You must create an ORDS JWT Profile. As of ORDS 25.1 each schema may have only one valid JWT Profile at a time. The JWT can be one of:
+You must create an ORDS JWT Profile. As of ORDS 25.1, each schema may have only one valid JWT Profile at a time. The JWT can be one of:
 
-- Scope Based Sccess Claim (SBAC)
-- Roles Based Access Claim (RBAC)
+- Scope-Based Access Control (SBAC)
+- Role-Based Access Control (RBAC)
 
-When configuring custom claims in OCI IAM you may do so with one of two options, an:
+When configuring custom claims in OCI IAM, you may do so with one of two options:
 
-- Identity Domain's User Attributes (additional attribues that you may have created)
+- Identity Domain's User Attributes (additional attributes that you may have created)
 - Integrated Application's Groups (and users therein)
 
 This tutorial demonstrates RBAC JWT Profiles. Execute the following PL/SQL procedure:
@@ -407,14 +407,14 @@ DECLARE
     L_P_DESCRIPTION     VARCHAR2(200) := 'ORDS RBAC JWTs demonstration';
     L_P_ROLE_CLAIM_NAME VARCHAR2(200) := '/iam_groups'; -- You must include a leading backslash. ORDS will interpret this as a JSON Pointer.
 BEGIN
-    ORDS_METADATA.ORDS_SECURITY.DELETE_JWT_PROFILE(); -- This is a common best practice to delete an existing JWT Profile, and overwrite.
+    ORDS_METADATA.ORDS_SECURITY.DELETE_JWT_PROFILE(); -- It is a common best practice to delete an existing JWT Profile and overwrite.
     ORDS_METADATA.ORDS_SECURITY.CREATE_JWT_PROFILE(
         P_ISSUER          => L_P_ISSUER,
         P_AUDIENCE        => L_P_AUDIENCE,
         P_JWK_URL         => L_P_JWK_URL,
         P_DESCRIPTION     => L_P_DESCRIPTION,
         P_ROLE_CLAIM_NAME => L_P_ROLE_CLAIM_NAME
-    ); -- Not included here: P_ALLOWED_SKEW and P_ALLOWED_AGE. These are optional parameters; when omitted their values are set to NULL (i.e. infinity).
+    ); -- Not included here: P_ALLOWED_SKEW and P_ALLOWED_AGE. These are optional parameters; when omitted, their values are set to NULL (i.e., infinity).
 END;
 ```
 
@@ -422,28 +422,28 @@ ORDS will now expect a `stringArray[]` (which was set in the previous OCI IAM cu
 
 ### Accessing protected ORDS resources
 
-This section provides two examples for demonstrating the OAuth2.0 Authorization Code Flow method for obtaining a valid JWT (Access Token).
+This section provides two examples for demonstrating the OAuth 2.0 Authorization Code Flow method for obtaining a valid JWT (Access Token).
 
 In the first example, we use Insomnia as well as `cURL` for this demonstration. These steps will be similar for Postman and other testing tools.
 
-The second example will demonstrate using a simple JavaScript and `Node.js`/`Express.js` single-page web application.
+The second example will demonstrate using a simple JavaScript and Node.js/Express.js single-page web application.
 
 #### Example 1: Insomnia and <code>cURL</code>
 
-##### Requesting an Authorization Code and acquiring a JWT
+##### Requesting an Authorization Code and Acquiring a JWT
 
 We have configured our Insomnia client with the following values:
 
 - **Grant Type:** `Authorization Code`
-- **Authorization URL:** `https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/authorize`
-- **Access Token URL:** `https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/token`
+- **Authorization URL:** `https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/authorize`
+- **Access Token URL:** `https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/token`
 - **Client ID:**
 - **Client Secret:**
 - **Redirect URL:** `https://insomnia.rest`
 - **Scope:** `audience01iam_groups`
 - **Credentials:** `As Basic Auth Header (default)`
 
-With these values, a request (i.e. clicking the `Fetch Tokens` button) for a valid JWT is sent. A new browser window or tab will open, enter in the credentials for the Alpha User with:
+With these values, a request (i.e., clicking the `Fetch Tokens` button) for a valid JWT is sent. A new browser window or tab will open, enter the credentials for the Alpha User with:
 
 - **User Name:** `alphauser`
 - **Password:** `[Password selected upon creating the alphauser]`
@@ -452,7 +452,7 @@ After submitting the user credentials, you will be redirected to Insomnia (or ot
 
 ###### Inspecting the JWT
 
-You may use your tool of choice for decoding or inspecting a JWT. Notice how `iam_groups` `stringArray[]` has included in the JWT. ORDS will expect this since it was included as a JSON Pointer in the `CREATE_JWT_PROFILE` PL/SQL procedure.
+You may use your tool of choice for decoding or inspecting a JWT. Notice how `iam_groups` `stringArray[]` is included in the JWT. ORDS will expect this since it was included as a JSON Pointer in the `CREATE_JWT_PROFILE` PL/SQL procedure.
 
 ```json
 {
@@ -569,8 +569,8 @@ You may optionally create your own project folder with the sample application co
 ```js
 const loginButton = document.getElementById('login');
 
-// There are several ways this can be acomplished. The focus shouldn't be on performance, or
-// whether this is conformes purely to ESM. 
+// There are several ways this can be accomplished. The focus shouldn't be on performance, or
+// whether this conforms purely to ESM. 
 const { clientId, tenantUrl } = await fetch('/config').then(r => r.json());
 const authorizationEndpoint = `${tenantUrl}/oauth2/v1/authorize`;
 const redirectUri = window.location.origin + '/callback';
@@ -616,7 +616,7 @@ loginButton.addEventListener('click', () => {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(r => r.json());
 
-    // With the response in hand, we display on the screen
+    // With the response in hand, we display it on the screen
     // the results of the GET request.
 
     const dbActual = document.createElement('p');
@@ -698,7 +698,7 @@ const redirectUri = process.env.REDIRECT_URI;
 const tokenEndpoint = `${tenantUrl}/oauth2/v1/token`;
 const ordsEndpoint = process.env.ORDS_ENDPOINT;
 
-// Adding this so we can securely retrieve the Client Id and Tenant URL from the .env file.
+// Adding this so we can securely retrieve the Client ID and Tenant URL from the .env file.
 
 app.get('/config', (req, res) => {
   res.json({
@@ -717,7 +717,7 @@ app.get('/callback', (req, res) => {
 app.post('/exchange_token', async (req, res) => {
   const { code } = req.body;
 
-  // These paramaters are ALL sent to the /oauth2/v1/token endpoint, so that the client/user can retrieve a valid JWT.
+  // These parameters are ALL sent to the /oauth2/v1/token endpoint, so that the client/user can retrieve a valid JWT.
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
@@ -738,7 +738,7 @@ app.post('/exchange_token', async (req, res) => {
     const tokenData = await response.json();
 
 // We convert the JSON Object to a JSON-formatted string. And assign/set the 
-// header to "Content-Type: application/json". We als well as sending to the app.js
+// header to "Content-Type: application/json". We also well as sending to the app.js
 // front end. 
     res.json(tokenData);
   } catch (err) {
@@ -860,11 +860,11 @@ This demo application will rely on the settings configured in your OCI IAM `ords
 - **Allowed grant types:** `Authorization code`
 - **Redirect URL:** `http://localhost:3000/callback`
 
-> **NOTE:** Additional grant types and Redirect URLs may be included. But to reproduce this demo as-is, these values must be included.
+> **NOTE:** Additional grant types and redirect URLs may be included. However, these values must be included to reproduce this demo as-is.
 
 ###### ORDS installation and configuration
 
-In this demonstration ORDS has been installed locally, with an Oracle 23ai database running in a Podman container. ORDS has been deployed in Standalone mode (embedded Jetty server) on `localhost` on port `8080`. The schema used is named `ORDSDEMO`. The ORDS Resource Modules, Templates, Handlers, Roles and Privileges remain unchanged from the previous example.
+In this demonstration, ORDS has been installed locally, with an Oracle 23ai database running in a Podman container. ORDS has been deployed in Standalone mode (embedded Jetty server) on `localhost` on port `8080`. The schema used is named `ORDSDEMO`. The ORDS Resource Modules, Templates, Handlers, Roles, and Privileges remain unchanged from the previous example.
 
 ##### Launching the demo app
 
@@ -880,7 +880,7 @@ You will see the following output:
 Server running at http://localhost:3000
 ```
 
-Click the link in your terminal to open the app's `Index.html` page. Click the <button>Login as IAM User</button> button. You will be temporary redirected to the OCI IAM Sign In page. Sign in with the following credentials:
+Click the link in your terminal to open the app's `Index.html` page. Click the <button>Login as IAM User</button> button. You will be temporarily redirected to the OCI IAM Sign In page. Sign in with the following credentials:
 
 - **User Name:** `alphauser`
 - **Password:** `[Password selected upon creating the alphauser]`
@@ -893,7 +893,7 @@ The current SYSTIMESTAMP for your database server is: 13-MAY-25 06.55.23.452414 
 You are currently logged in as the following user: alphauser
 ```
 
-If you clear your browser's cache and press the <button>Login as IAM User</button> again, you'll be redirected to the OCI IAM Sign In page. Sign in as the `betauser` and you will be redirected back to the sample application. Both fields will return the following message:
+If you clear your browser's cache and press the <button>Login as IAM User</button> again, you'll be redirected to the OCI IAM Sign In page. Sign in as the Beta User, and you will be redirected back to the sample application. Both fields will return the following message:
 
 ```bash
 The current SYSTIMESTAMP for your database server is: undefined
@@ -901,7 +901,7 @@ The current SYSTIMESTAMP for your database server is: undefined
 You are currently logged in as the following user: undefined
 ```
 
-The application will have recieved a valid JWT. But decoding it would reveal the following Custom Claim:
+The application will have received a valid JWT. But decoding it would reveal the following Custom Claim:
 
 ```json
 {...
@@ -909,7 +909,7 @@ The application will have recieved a valid JWT. But decoding it would reveal the
 ...}
 ```
 
-Since the `/ordsdemo/alpha_v1/alpha_group` endpoint is protected by the `alphagroup` role. Since the `alphagroup` privilege does not include the `betagroup` role, this `betauser` cannot access this end point.
+Since the `/ordsdemo/alpha_v1/alpha_group` endpoint is protected by the `alphagroup` role and since the `alphagroup` privilege does not include the `betagroup` role, this Beta User cannot access this endpoint.
 
 ### Wrap-up
 
@@ -927,5 +927,5 @@ The following are helpful resources when working with ORDS and JWTs
 
 - [ORDS and JWT docs](https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-B1ED4DFD-9DD4-4FBF-B91D-35373D756538) (ORDS Developer's Guide)
 - [Configuring OCI IAM JWTs and ORDS for Scope Based Access Control (SBAC) claims](https://followthecoffee.com/configuring-oci-iam-domain-jwts-to-use-with-ords/) (Blog)
-- [MicroSoft Entra JWTS with ORDS SBAC claims](https://followthecoffee.com/ords-apis-and-microsoft-entra-jwts-tutorial/) (Blog)
+- [Microsoft Entra JWTS with ORDS SBAC claims](https://followthecoffee.com/ords-apis-and-microsoft-entra-jwts-tutorial/) (Blog)
 - [ORDS Troubleshooting a 401 invalid_token response](https://followthecoffee.com/401-unauthorized-invalid_token-troubleshooting-oracle-cloud-iam-jwts-with-ords/) (Blog)
