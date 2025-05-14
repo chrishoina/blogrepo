@@ -177,7 +177,7 @@ You will recieve an `HTTP/1.1 201 Created` response after your `POST` request is
 
 ```sh
 curl --request GET \
-  --url https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
+  --url https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ \
   --header 'Authorization: Bearer [Your Access Token]' \
 ```
 
@@ -199,7 +199,7 @@ DECLARE
   l_modules   OWA.VC_ARR;
   l_patterns  OWA.VC_ARR;
 
-BEGIN   
+BEGIN
   ORDS.DEFINE_MODULE(
       p_module_name    => 'alpha.group.module.v1',
       p_base_path      => '/alpha_v1/',
@@ -220,16 +220,46 @@ BEGIN
       p_pattern        => 'alpha_group',
       p_method         => 'GET',
       p_source_type    => 'plsql/block',
-      p_items_per_page => 25,
       p_mimes_allowed  => NULL,
       p_comments       => NULL,
       p_source         => 
 'DECLARE
-  l_json VARCHAR2(1000);
+    l_date VARCHAR2(100);
+    l_user varchar2(100);
+    l_status varchar2(100);
 BEGIN
-    l_json := ''{"data":"You are authorized to view this ALPHA group resource."}'';
-    htp.p(l_json);
+    l_user := :current_user;
+    SELECT
+        SYSTIMESTAMP, :current_user
+    INTO l_date, l_user
+    FROM
+        DUAL;
+
+    :dbActual := l_date;
+    :crtUser := l_user;
 END;');
+
+  ORDS.DEFINE_PARAMETER(
+      p_module_name        => 'alpha.group.module.v1',
+      p_pattern            => 'alpha_group',
+      p_method             => 'GET',
+      p_name               => 'dbActual',
+      p_bind_variable_name => 'dbActual',
+      p_source_type        => 'RESPONSE',
+      p_param_type         => 'STRING',
+      p_access_method      => 'OUT',
+      p_comments           => NULL);
+
+  ORDS.DEFINE_PARAMETER(
+      p_module_name        => 'alpha.group.module.v1',
+      p_pattern            => 'alpha_group',
+      p_method             => 'GET',
+      p_name               => 'crtUser',
+      p_bind_variable_name => 'crtUser',
+      p_source_type        => 'RESPONSE',
+      p_param_type         => 'STRING',
+      p_access_method      => 'OUT',
+      p_comments           => NULL);
 
   ORDS.DEFINE_MODULE(
       p_module_name    => 'beta.group.module.v1',
@@ -256,12 +286,44 @@ END;');
       p_comments       => NULL,
       p_source         => 
 'DECLARE
-  l_json VARCHAR2(1000);
+    l_date VARCHAR2(100);
+    l_user varchar2(100);
+    l_status varchar2(100);
 BEGIN
-    l_json := ''{"data:""You are authorized to view this BETA group resource."}'';
-    htp.p(l_json);
+    l_user := :current_user;
+    SELECT
+        SYSTIMESTAMP, :current_user
+    INTO l_date, l_user
+    FROM
+        DUAL;
+
+    :dbActual := l_date;
+    :crtUser := l_user;
 END;');
 
+  ORDS.DEFINE_PARAMETER(
+      p_module_name        => 'beta.group.module.v1',
+      p_pattern            => 'beta_group',
+      p_method             => 'GET',
+      p_name               => 'crtUser',
+      p_bind_variable_name => 'crtUser',
+      p_source_type        => 'RESPONSE',
+      p_param_type         => 'STRING',
+      p_access_method      => 'OUT',
+      p_comments           => NULL);
+
+  ORDS.DEFINE_PARAMETER(
+      p_module_name        => 'beta.group.module.v1',
+      p_pattern            => 'beta_group',
+      p_method             => 'GET',
+      p_name               => 'dbActual',
+      p_bind_variable_name => 'dbActual',
+      p_source_type        => 'RESPONSE',
+      p_param_type         => 'STRING',
+      p_access_method      => 'OUT',
+      p_comments           => NULL);
+
+    
   ORDS.CREATE_ROLE(p_role_name => 'alphagroup');
   ORDS.CREATE_ROLE(p_role_name => 'betagroup');
     
@@ -296,7 +358,8 @@ END;');
   l_roles.DELETE;
   l_modules.DELETE;
   l_patterns.DELETE;
-           
+    
+          
 COMMIT;
 
 END;
