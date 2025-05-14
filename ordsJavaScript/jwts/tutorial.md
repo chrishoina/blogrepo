@@ -2,7 +2,9 @@
 
 ## Intro
 
-![Roles based ORDS js app demo gif](./blogimages/9-roles-based-with-iam-groups.gif " ")
+![Roles based ORDS js app demo gif](./blogimages/9-roles-based-with-iam-groups-white-background.gif " ")
+
+![Roles based ORDS js app demo gif](./blogimages/10-roles-based-with-iam-groups-transparent-background.gif " ")
 
 This tutorial demonstrates using Roles-Based Access Control (RBAC) claims in an Oracle Cloud Infrastructure (OCI) Identity and Access Management (IAM) JSON Web Token (JWT) to access Oracle REST Data Services (ORDS) protected resources (i.e., API endpoints).
 
