@@ -115,7 +115,7 @@ For demonstration purposes, each group will have two users:
 
 In a later section, you will see how these users are mapped to ORDS Roles. Those Roles will then be assigned to ORDS Privileges, which will be used when validating the OCI IAM JSON Web Token.
 
-You may map your Identity Domain Groups to an ORDS Privilege *or* and an ORDS Role. For finer-grain control, mapping to an ORDS Role is recommended. This method allows you to add many roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
+You may map your Identity Domain Groups to an ORDS Privilege *or* an ORDS Role. For finer-grain control, mapping to an ORDS Role is recommended. This method allows you to add many Roles to a single ORDS Privilege. Thus making it much easier to revoke a user's access by removing a Role, rather than a Privilege.
 
 ##### Configuring the <code>manage-claims-app</code> application
 
