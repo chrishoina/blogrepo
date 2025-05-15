@@ -19,7 +19,7 @@ ORDS JWT Profiles can be scope-based or role-based. This tutorial demonstrates u
 
 > **About:** [ORDS JWT profiles](https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-1E914685-2E05-4380-955D-F8232815E365)
 >
-> **Note:** Helpful resources are provided at the end of this tutorial.
+> **Note:** Additional resources are provided at the end of this tutorial.
 
 ### Prerequisites
 
@@ -27,7 +27,7 @@ ORDS JWT Profiles can be scope-based or role-based. This tutorial demonstrates u
 
    - This Domain should have the **Configure client access** Domain Setting enabled.  
 
-     > **Note:** You can enable this setting from within your Identity Domain's dashboard by navigating to **Settings**, locating the **Access signing certificate**, and verifying that the **Configure client access** Check Box is checked.  
+     > **Note:** You can enable this setting from within your Identity Domain's dashboard by navigating to **Settings**, locating the **Access signing certificate** setting, and verifying that the **Configure client access** Check Box is checked.  
 
      ![Domain Settings](./blogimages/1-domain-settings.png " ")
 
