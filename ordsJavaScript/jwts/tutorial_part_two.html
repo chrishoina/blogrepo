@@ -1,0 +1,418 @@
+<h1
+id="configuring-roles-based-access-claims-in-oci-identity-and-access-management-json-web-tokens-for-accessing-oauth2.0-protected-oracle-database-rest-apis-part-two">Configuring
+Roles-Based Access Claims in OCI Identity and Access Management JSON Web
+Tokens for accessing OAuth2.0 protected Oracle database REST APIs Part
+Two</h1>
+<h2 id="intro">Intro</h2>
+<p>![Roles based ORDS js app demo
+gif](./blogimages/9-roles-based-with-iam-groups-white-background.gif ”
+“)</p>
+<p>This tutorial expands on Part One of the use of Roles-Based Access
+Control (RBAC) claims in an Oracle Cloud Infrastructure (OCI) Identity
+and Access Management (IAM) JSON Web Token (JWT) to access Oracle REST
+Data Services (ORDS) protected resources (i.e., API endpoints).</p>
+<p>In Part Two of this tutorial we provide steps for testing and
+experimenting using a sample JavaScript single-page web application
+(using HTML, Node.js and the Express.js framework).</p>
+<p>Two review important configuration steps, prerequisites and an
+expanded overview, visit Part One of this tutorial.</p>
+<h3 id="example-2-javascript-and-node.jsexpress.js">Example 2:
+JavaScript and <code>Node.js</code>/<code>Express.js</code></h3>
+<p>The following depicts the structure of this sample application:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jwts/</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> node_modules</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> package-lock.json</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> package.json</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> public</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">│  </span> ├── app.js</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">│  </span> └── index.html</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> server.js</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> ordsdemo.sql</span></code></pre></div>
+<p><strong>Note:</strong> Part Two relies on the same configuration as
+Part Two of this series. Review the configuration settings prior to
+attempting this example.</p>
+<h4 id="project-folder">Project folder</h4>
+<p>All sample code can be found at the following <a
+href="https://github.com/chrishoina/blogrepo/tree/4e48076cbf0f8170f4f7620f73be3b18ad9491f7/ordsJavaScript/jwts">GitHub
+repository</a>.</p>
+<p>You may optionally create your own project folder with the sample
+application code found on this page. The project consists of four main
+files:</p>
+<h5 id="app.js">App.js</h5>
+<div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> loginButton <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;login&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">// There are several ways this can be accomplished. The focus shouldn&#39;t be on performance, or</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// whether this conforms purely to ESM. </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { clientId<span class="op">,</span> tenantUrl } <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(<span class="st">&#39;/config&#39;</span>)<span class="op">.</span><span class="fu">then</span>(r <span class="kw">=&gt;</span> r<span class="op">.</span><span class="fu">json</span>())<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> authorizationEndpoint <span class="op">=</span> <span class="vs">`</span><span class="sc">${</span>tenantUrl<span class="sc">}</span><span class="vs">/oauth2/v1/authorize`</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> redirectUri <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">origin</span> <span class="op">+</span> <span class="st">&#39;/callback&#39;</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> scope <span class="op">=</span> <span class="st">&#39;audience01iam_groups&#39;</span><span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>loginButton<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">&#39;click&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> params <span class="op">=</span> <span class="kw">new</span> <span class="fu">URLSearchParams</span>({</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">response_type</span><span class="op">:</span> <span class="st">&#39;code&#39;</span><span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">client_id</span><span class="op">:</span> clientId<span class="op">,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">redirect_uri</span><span class="op">:</span> redirectUri<span class="op">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    scope</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">// The &quot;params&quot; are sent to the IAM /oauth2/v1/authorize endpoint.</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="bu">window</span><span class="op">.</span><span class="at">location</span> <span class="op">=</span> <span class="vs">`</span><span class="sc">${</span>authorizationEndpoint<span class="sc">}</span><span class="vs">?</span><span class="sc">${</span>params<span class="op">.</span><span class="fu">toString</span>()<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">// Handling the redirect from Oracle IAM. RECALL, you&#39;ll need to set this redirect up in </span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">// the OAuth Configuration section for your Integrated Application (in IAM).</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>(<span class="kw">async</span> <span class="kw">function</span> <span class="fu">handleRedirect</span>() {</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> params <span class="op">=</span> <span class="kw">new</span> <span class="fu">URLSearchParams</span>(<span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">search</span>)<span class="op">;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> code <span class="op">=</span> params<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;code&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>code) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Using this Authorization code, to retrieve a JWT from the IAM /oauth2/v1/token endpoint.</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(<span class="st">&#39;/exchange_token&#39;</span><span class="op">,</span> {</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="dt">method</span><span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="dt">headers</span><span class="op">:</span> { <span class="st">&#39;Content-Type&#39;</span><span class="op">:</span> <span class="st">&#39;application/json&#39;</span> }<span class="op">,</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">body</span><span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({ code })</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> tokenData <span class="op">=</span> <span class="cf">await</span> response<span class="op">.</span><span class="fu">json</span>()<span class="op">;</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tokenData<span class="op">.</span><span class="at">error</span>) {</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Token exchange error:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">+</span> tokenData)<span class="op">;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="co">// A GET request is issued to the ORDS endpoint via the Server.js backend.</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> accessToken <span class="op">=</span> tokenData<span class="op">.</span><span class="at">access_token</span><span class="op">;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ordsInfo <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(<span class="st">&#39;/to_ords&#39;</span><span class="op">,</span> {</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>      <span class="dt">headers</span><span class="op">:</span> { <span class="dt">Authorization</span><span class="op">:</span> <span class="vs">`Bearer </span><span class="sc">${</span>accessToken<span class="sc">}</span><span class="vs">`</span> }</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    })<span class="op">.</span><span class="fu">then</span>(r <span class="kw">=&gt;</span> r<span class="op">.</span><span class="fu">json</span>())<span class="op">;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">// With the response in hand, we display it on the screen</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">// the results of the GET request.</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> dbActual <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;p&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> crtUsr <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;p&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="co">// dbActual and crtUser refer to the output bind parameters found in the individual ORDS Resource Handlers. Refer to the ORDS &gt; Resource Module section of part one of the blog series to review the ORDS Resource Module/Template/Handler definitons.</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    dbActual<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> <span class="vs">`The current &lt;code&gt;SYSTIMESTAMP&lt;/code&gt; for your database server is: &lt;code&gt;</span><span class="sc">${</span>ordsInfo<span class="op">.</span><span class="at">dbActual</span><span class="sc">}</span><span class="vs">&lt;/code&gt;`</span><span class="op">;</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    crtUsr<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> <span class="vs">`You are currently logged in as the following user: &lt;code&gt;</span><span class="sc">${</span>ordsInfo<span class="op">.</span><span class="at">crtUser</span><span class="sc">}</span><span class="vs">&lt;/code&gt;`</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(dbActual)<span class="op">;</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(crtUsr)<span class="op">;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (loginButton) {</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        loginButton<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">&#39;fade-out&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="pp">setTimeout</span>(() <span class="kw">=&gt;</span> loginButton<span class="op">.</span><span class="fu">remove</span>()<span class="op">,</span> <span class="dv">500</span>)<span class="op">;</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>      }<span class="op">;</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> backButton <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;button&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    backButton<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> <span class="st">&#39;Home&#39;</span><span class="op">;</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    backButton<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">color</span> <span class="op">=</span> <span class="st">&#39;blue&#39;</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    backButton<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">marginTop</span> <span class="op">=</span> <span class="st">&#39;1rem&#39;</span><span class="op">;</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    backButton<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">&#39;click&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>      <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/&#39;</span><span class="op">;</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>    <span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(backButton)<span class="op">;</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>})()<span class="op">;</span></span></code></pre></div>
+<h6 id="server.js">Server.js</h6>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> express <span class="im">from</span> <span class="st">&#39;express&#39;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fetch <span class="im">from</span> <span class="st">&#39;node-fetch&#39;</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dotenv <span class="im">from</span> <span class="st">&#39;dotenv&#39;</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> path <span class="im">from</span> <span class="st">&#39;path&#39;</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { fileURLToPath } <span class="im">from</span> <span class="st">&#39;url&#39;</span><span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Required to load the .env file from your project. </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>dotenv<span class="op">.</span><span class="fu">config</span>()<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">// We&#39;ve &quot;abstracted&quot; the following properties:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">// - CLIENT_ID</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">// - CLIENT_SECRET</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">// - TENANT_URL</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">// - REDIRECT_URI</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">// - AUTH_ENDPOINT</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">// - TOKEN_ENDPOINT</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">// - ORDS_ENDPOINT</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="fu">express</span>()<span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> PORT <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">PORT</span> <span class="op">||</span> <span class="dv">3000</span><span class="op">;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">// The following are used to construct file paths reliably, especially for:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">// - Sending static files </span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">// - Locating `.env` or other local files</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">// - Navigating relative directories</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> <span class="bu">__filename</span> <span class="op">=</span> <span class="fu">fileURLToPath</span>(<span class="im">import</span><span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">url</span>)<span class="op">;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> <span class="bu">__dirname</span> <span class="op">=</span> path<span class="op">.</span><span class="fu">dirname</span>(<span class="bu">__filename</span>)<span class="op">;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">// This first line ensures we’re pointing to the correct absolute file path for `index.html`, </span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">// no matter where or how the app is launched.</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(express<span class="op">.</span><span class="fu">static</span>(path<span class="op">.</span><span class="fu">join</span>(<span class="bu">__dirname</span><span class="op">,</span> <span class="st">&#39;public&#39;</span>)))<span class="op">;</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(express<span class="op">.</span><span class="fu">json</span>())<span class="op">;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(express<span class="op">.</span><span class="fu">urlencoded</span>({ <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span> }))<span class="op">;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co">// These may need to be modified depending on which OAuth2.0 Code Flow you are using. In this case, we use</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co">// Authorization Code, since we need to identify the user. In this case, the user is assigned to an OCI IAM Group.</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co">// And that Group is mapped to an ORDS Role. The ORDS Role is assigned to an ORDS Privilege. That is how we map the OCI IAM </span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co">// Group to the ORDS JWT Profile. </span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co">// Note: The callback needs to be added to your OCI Integrated Application&#39;s OAuth2.0 Configuration.</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> clientId <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CLIENT_ID</span><span class="op">;</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> clientSecret <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CLIENT_SECRET</span><span class="op">;</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> tenantUrl <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">TENANT_URL</span><span class="op">;</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> redirectUri <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">REDIRECT_URI</span><span class="op">;</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> tokenEndpoint <span class="op">=</span> <span class="vs">`</span><span class="sc">${</span>tenantUrl<span class="sc">}</span><span class="vs">/oauth2/v1/token`</span><span class="op">;</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ordsEndpoint <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">ORDS_ENDPOINT</span><span class="op">;</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co">// Adding this so we can securely retrieve the Client ID and Tenant URL from the .env file.</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/config&#39;</span><span class="op">,</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  res<span class="op">.</span><span class="fu">json</span>({</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="dt">clientId</span><span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CLIENT_ID</span><span class="op">,</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="dt">tenantUrl</span><span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">TENANT_URL</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co">// To keep this application simple, the /callback endpoint ultimately ends up serving the index.html page.</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/callback&#39;</span><span class="op">,</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>  res<span class="op">.</span><span class="fu">sendFile</span>(path<span class="op">.</span><span class="fu">join</span>(<span class="bu">__dirname</span><span class="op">,</span> <span class="st">&#39;public&#39;</span><span class="op">,</span> <span class="st">&#39;index.html&#39;</span>))<span class="op">;</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="co">// This step happens AFTER you have signed into IAM with your user credentials. You have arrived here via the handleRedirect() function in the </span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="co">// app.js file.</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/exchange_token&#39;</span><span class="op">,</span> <span class="kw">async</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { code } <span class="op">=</span> req<span class="op">.</span><span class="at">body</span><span class="op">;</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  <span class="co">// These parameters are ALL sent to the /oauth2/v1/token endpoint, so that the client/user can retrieve a valid JWT.</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> body <span class="op">=</span> <span class="kw">new</span> <span class="fu">URLSearchParams</span>({</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    <span class="dt">grant_type</span><span class="op">:</span> <span class="st">&#39;authorization_code&#39;</span><span class="op">,</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    code<span class="op">,</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="dt">redirect_uri</span><span class="op">:</span> redirectUri<span class="op">,</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="dt">client_id</span><span class="op">:</span> clientId<span class="op">,</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    <span class="dt">client_secret</span><span class="op">:</span> clientSecret</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(tokenEndpoint<span class="op">,</span> {</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>      <span class="dt">method</span><span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>      <span class="dt">headers</span><span class="op">:</span> { <span class="st">&#39;Content-Type&#39;</span><span class="op">:</span> <span class="st">&#39;application/x-www-form-urlencoded&#39;</span> }<span class="op">,</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>      <span class="dt">body</span><span class="op">:</span> body<span class="op">.</span><span class="fu">toString</span>()</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    <span class="co">// With the JWT &quot;in hand,&quot; the application &quot;exits&quot; the /exchange_token endpoint (and its functions).</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> tokenData <span class="op">=</span> <span class="cf">await</span> response<span class="op">.</span><span class="fu">json</span>()<span class="op">;</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="co">// We convert the JSON Object to a JSON-formatted string. And assign/set the </span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="co">// header to &quot;Content-Type: application/json&quot;. We also well as sending to the app.js</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="co">// front end. </span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">json</span>(tokenData)<span class="op">;</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (err) {</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(err)<span class="op">;</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">status</span>(<span class="dv">500</span>)<span class="op">.</span><span class="fu">json</span>({ <span class="dt">error</span><span class="op">:</span> <span class="st">&#39;Token exchange failed&#39;</span> })<span class="op">;</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="co">// &quot;Splitting&quot; on the whitespace between Bearer &#39; &#39; and the token, and using that to issue a GET</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="co">// request to the ORDS endpoint. </span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/to_ords&#39;</span><span class="op">,</span> <span class="kw">async</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> accessToken <span class="op">=</span> req<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">authorization</span><span class="op">?.</span><span class="fu">split</span>(<span class="st">&#39; &#39;</span>)[<span class="dv">1</span>]<span class="op">;</span></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ordsInfoResponse <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(ordsEndpoint<span class="op">,</span> {</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>      <span class="dt">headers</span><span class="op">:</span> {</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Authorization</span><span class="op">:</span> <span class="vs">`Bearer </span><span class="sc">${</span>accessToken<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The response from the GET request to the ORDS endpoint.</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ordsInfo <span class="op">=</span> <span class="cf">await</span> ordsInfoResponse<span class="op">.</span><span class="fu">json</span>()<span class="op">;</span></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The &quot;res&quot; will be passed back to the app.js front end for display. Which will then in turn</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>    <span class="co">// pass to the index.html page.</span></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">json</span>(ordsInfo)<span class="op">;</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (err) {</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(err)<span class="op">;</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">status</span>(<span class="dv">500</span>)<span class="op">.</span><span class="fu">json</span>({ <span class="dt">error</span><span class="op">:</span> <span class="st">&#39;Fetching ORDS data failed, review console details for clues.&#39;</span> })<span class="op">;</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">listen</span>(PORT<span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Server running at http://localhost:</span><span class="sc">${</span>PORT<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h6 id="index.html">Index.html</h6>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="ot"> lang</span><span class="op">=</span><span class="st">&quot;en&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">meta</span><span class="ot"> charset</span><span class="op">=</span><span class="st">&quot;UTF-8&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>ORDS and RBAC JWTs<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">style</span><span class="dt">&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="pp">#login</span><span class="fu">.fade-out</span> {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">transition</span><span class="ch">:</span> <span class="dv">opacity 0.5</span><span class="dt">s</span> <span class="dv">ease</span><span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">opacity</span><span class="ch">:</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">style</span><span class="dt">&gt;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h3</span><span class="ot"> style</span><span class="op">=</span><span class="st">&quot;color: darkslategray&quot;</span><span class="dt">&gt;</span>Demo: ORDS Roles-Based Access Claims (RBAC) and OCI Identity and Access Management JSON Web Tokens (JWTs)<span class="dt">&lt;/</span><span class="kw">h3</span><span class="dt">&gt;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> style</span><span class="op">=</span><span class="st">&quot;color: blue&quot;</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;login&quot;</span><span class="dt">&gt;</span>Login as IAM user<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">script</span><span class="ot"> type=</span><span class="st">&quot;module&quot;</span><span class="ot"> src</span><span class="op">=</span><span class="st">&quot;app.js&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div>
+<h5 id="env">.ENV</h5>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">CLIENT_ID</span><span class="op">=</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">CLIENT_SECRET</span><span class="op">=</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="va">TENANT_URL</span><span class="op">=</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="va">REDIRECT_URI</span><span class="op">=</span>http://localhost:3000/callback</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">AUTH_ENDPOINT</span><span class="op">=</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="va">TOKEN_ENDPOINT</span><span class="op">=</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="va">ORDS_ENDPOINT</span><span class="op">=</span>http://localhost:8080/ords/ordsdemo/jwtdemoalpha/alpha_group</span></code></pre></div>
+<h4 id="application-dependencies">Application dependencies</h4>
+<h5 id="npm">NPM</h5>
+<p>The required dependencies for the application can be added with the
+following command:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install express dotenv node-fetch</span></code></pre></div>
+<h5 id="env-file">.ENV file</h5>
+<p>If you choose to use a <code>.ENV</code> file, you must configure
+yours to match your development and OCI IAM settings. You should replace
+the following:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">CLIENT_ID</span><span class="op">=</span>[Your <span class="ex">Integrated</span> Application Client ID]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">CLIENT_SECRET</span><span class="op">=</span>[Your <span class="ex">Integrated</span> Application Client Secret]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="va">TENANT_URL</span><span class="op">=</span>https://idcs-[Your <span class="ex">unique</span> Tenant Identifier].identity.oraclecloud.com:443</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="va">REDIRECT_URI</span><span class="op">=</span>http://localhost:3000/callback</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="va">AUTH_ENDPOINT</span><span class="op">=</span>https://idcs-[Your <span class="ex">unique</span> Tenant Identifier].identity.oraclecloud.com:443/oauth2/v1/authorize</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="va">TOKEN_ENDPOINT</span><span class="op">=</span>https://idcs-[Your <span class="ex">unique</span> Tenant Identifier].identity.oraclecloud.com:443/oauth2/v1/token</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="va">ORDS_ENDPOINT</span><span class="op">=</span>http://localhost:8080/ords/ordsdemo/jwtdemoalpha/alpha_group</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Your ORDS endpoint may differ depending on
+your installation and deployment. The use of a <code>.ENV</code> file is
+optional; although, code changes will be required if you decide to omit
+it.</p>
+</blockquote>
+<h5 id="oci-iam-configuration">OCI IAM configuration</h5>
+<p>This demo application will rely on the settings configured in your
+OCI IAM <code>ords-jwt-demo-app</code> Integrated Application. Refer to
+part one of this tutorial for configuration settings. Verify that you
+have also included the following <strong>Client configuration</strong>
+settings:</p>
+<ul>
+<li><strong>Allowed grant types:</strong>
+<code>Authorization code</code></li>
+<li><strong>Redirect URL:</strong>
+<code>http://localhost:3000/callback</code></li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> Additional grant types and redirect URLs may
+be included. However, the above values must be included to reproduce
+this demo as-is.</p>
+</blockquote>
+<h5 id="ords-installation-and-configuration">ORDS installation and
+configuration</h5>
+<p>In this demonstration, ORDS has been installed locally, with an
+Oracle 23ai database running in a Podman container. ORDS has been
+deployed in Standalone mode (embedded Jetty server) on
+<code>localhost</code> on port <code>8080</code>. The schema used is
+named <code>ORDSDEMO</code>. The ORDS Resource Modules, Templates,
+Handlers, Roles, and Privileges remain unchanged from the previous
+example.</p>
+<blockquote>
+<p><strong>Note:</strong> ORDS and Oracle Database 23ai Docker/Podman
+containers are both available in the Oracle Container Registry.</p>
+<ul>
+<li><a
+href="https://container-registry.oracle.com/ords/ocr/ba/database/ords">ORDS</a></li>
+<li><a
+href="https://container-registry.oracle.com/ords/ocr/ba/database/free">23ai</a></li>
+</ul>
+</blockquote>
+<h4 id="launching-the-demo-app">Launching the demo app</h4>
+<p>With the configuration complete, you can launch the application using
+a Node.js server from your IDE’s console. Use the following command:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> server.js</span></code></pre></div>
+<p>You will see the following output in your IDE’s console:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Server</span> running at http://localhost:3000</span></code></pre></div>
+<p>Click the link to open the app’s <code>Index.html</code> page. Then
+click the <button>Login as IAM User</button> button. You will be
+temporarily redirected to the OCI IAM Sign In page. Sign in with the
+following credentials:</p>
+<ul>
+<li><strong>User Name:</strong> <code>alphauser</code></li>
+<li><strong>Password:</strong>
+<code>[Password selected upon creating the alphauser]</code></li>
+</ul>
+<p>Once you have signed in, you will be redirected to the sample
+application. The results of the ORDS <code>GET</code> request will be
+displayed on screen:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> current SYSTIMESTAMP for your database server is: 13-MAY-25 06.55.23.452414 PM +00:00</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">You</span> are currently logged in as the following user: alphauser</span></code></pre></div>
+<h5 id="video-demonstration">Video demonstration</h5>
+<video src="./blogimages/11-roles-based-with-iam-groups1080.m4v" controls>
+</video>
+<video src="./blogimages/12-roles-based-with-iam-groups720.m4v" controls>
+</video>
+<p>If you clear your browser’s cache and press the <button>Login as IAM
+User</button> again, you’ll be redirected to the OCI IAM Sign In page.
+Sign in as the Beta User, and you will be redirected back to the sample
+application. Both fields will return the following message:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> current SYSTIMESTAMP for your database server is: undefined</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">You</span> are currently logged in as the following user: undefined</span></code></pre></div>
+<h5 id="invalid-jwtunauthorized">Invalid JWT/Unauthorized</h5>
+<p>The application will have received a valid JWT. But decoding it would
+reveal the following Custom Claim:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="er">...</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&quot;iam_groups&quot;</span><span class="fu">:</span> <span class="ot">[</span> <span class="st">&quot;betagroup&quot;</span> <span class="ot">]</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="er">...</span><span class="fu">}</span></span></code></pre></div>
+<p>Since the <code>/ordsdemo/alpha_v1/alpha_group</code> endpoint is
+protected by the <code>alphagroup</code> role and since the
+<code>alphagroup</code> privilege does not include the
+<code>betagroup</code> role, this Beta User cannot access this
+endpoint.</p>
+<h2 id="wrap-up">Wrap-up</h2>
+<p>By now, you should have a better understanding of how to:</p>
+<ol type="1">
+<li>Create a custom claim from a Group in your Identity Domain’s
+Integrated Application</li>
+<li>Protect ORDS with a role that matches the custom claim and create
+the requisite JWT Profile</li>
+<li>Navigate an OAuth2.0 Authorization Code grant type (for acquiring an
+OCI IAM JWT) two ways:
+<ul>
+<li><code>cURL</code></li>
+<li>Single-page JavaScript web application using <code>Node.js</code>
+and <code>Express.js</code></li>
+</ul></li>
+</ol>
+<h2 id="resources">Resources</h2>
+<p>The following are helpful resources when working with ORDS and
+JWTs</p>
+<ul>
+<li><a
+href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-B1ED4DFD-9DD4-4FBF-B91D-35373D756538">ORDS
+and JWT docs</a> (ORDS Developer’s Guide)</li>
+<li><a
+href="https://followthecoffee.com/configuring-oci-iam-domain-jwts-to-use-with-ords/">Configuring
+OCI IAM JWTs and ORDS for Scope Based Access Control (SBAC) claims</a>
+(Blog)</li>
+<li><a
+href="https://followthecoffee.com/ords-apis-and-microsoft-entra-jwts-tutorial/">Microsoft
+Entra JWTS with ORDS SBAC claims</a> (Blog)</li>
+<li><a
+href="https://followthecoffee.com/401-unauthorized-invalid_token-troubleshooting-oracle-cloud-iam-jwts-with-ords/">ORDS
+Troubleshooting a 401 invalid_token response</a> (Blog)</li>
+<li><a
+href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/implicit-parameters.html">About
+ORDS Implicit Parameters</a></li>
+</ul>

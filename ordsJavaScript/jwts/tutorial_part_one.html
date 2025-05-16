@@ -1,0 +1,696 @@
+<h1
+id="configuring-roles-based-access-claims-in-oci-identity-and-access-management-json-web-tokens-for-accessing-oauth2.0-protected-oracle-database-rest-apis-part-one">Configuring
+Roles-Based Access Claims in OCI Identity and Access Management JSON Web
+Tokens for accessing OAuth2.0 protected Oracle database REST APIs Part
+One</h1>
+<h2 id="intro">Intro</h2>
+<p>![Roles based ORDS js app demo
+gif](./blogimages/9-roles-based-with-iam-groups-white-background.gif ”
+“)</p>
+<p>This tutorial demonstrates the use of Roles-Based Access Control
+(RBAC) claims in an Oracle Cloud Infrastructure (OCI) Identity and
+Access Management (IAM) JSON Web Token (JWT) to access Oracle REST Data
+Services (ORDS) protected resources (i.e., API endpoints).</p>
+<p>While in this tutorial, we rely on OCI IAM JWTs, other third-party
+Identity Providers may differ in their workflows, but there is likely to
+be considerable overlap and valuable information contained here.</p>
+<p>We provides steps for testing and experimenting with two different
+use cases:</p>
+<ol type="1">
+<li>API testing tool example (we use <a
+href="https://insomnia.rest">Insomnia</a>, an alternative to <a
+href="https://www.postman.com">Postman</a>)</li>
+<li>Sample JavaScript single-page web application (using HTML, Node.js
+and the Express.js framework)</li>
+</ol>
+<h3 id="about-ords-jwt-profiles">About ORDS JWT Profiles</h3>
+<p>ORDS JWT Profiles can be scope-based or role-based. This tutorial
+demonstrates using an OCI IAM Integrated Application’s Groups and its
+Users as the basis for Role-Based Access. You may optionally use custom
+User Attributes for your custom claims. This use case is outside the
+scope of this tutorial, and will be demonstrated in a future
+publication.</p>
+<blockquote>
+<p><strong>About:</strong> <a
+href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-1E914685-2E05-4380-955D-F8232815E365">ORDS
+JWT profiles</a></p>
+<p><strong>Note:</strong> Developer resources are provided at the end of
+this tutorial.</p>
+</blockquote>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>The following prerequisites apply to both of the use cases mentioned
+above. Some degree of experience with the following applications is
+expected.</p>
+<ol type="1">
+<li><p>An existing Identity Domain</p>
+<ul>
+<li><p>This Domain should have the <strong>Configure client
+access</strong> Domain setting enabled.</p>
+<blockquote>
+<p><strong>Note:</strong> You can enable this setting from within your
+Identity Domain’s dashboard by navigating to <strong>Settings</strong>,
+locating the <strong>Access signing certificate</strong> setting, and
+verifying that the <strong>Configure client access</strong> check box is
+checked.</p>
+</blockquote>
+<p>![Domain Settings](./blogimages/1-domain-settings.png ” “)</p></li>
+</ul></li>
+<li><p>Integrated Applications</p>
+<ul>
+<li><p>You must configure two Integrated Applications in your Identity
+Domain, one each for:</p>
+<ol type="1">
+<li><p>Creating Custom Claims for your Identity Domain</p></li>
+<li><p>Your target/demo application</p>
+<blockquote>
+<p><strong>Note:</strong> Your target application must have at least one
+Group and one User.</p>
+</blockquote></li>
+</ol></li>
+</ul></li>
+<li><p>An existing 25.1 or later ORDS installation</p>
+<ul>
+<li><p>You must configure the following to reproduce this demonstration
+(see below for included scripts to assist you with this tutorial):</p>
+<ol type="1">
+<li>ORDS Roles and Privileges</li>
+<li>ORDS JWT Profile</li>
+<li>ORDS Resource Module, Template, and Handlers</li>
+</ol></li>
+</ul></li>
+<li><p>An Oracle database installation; one of:</p>
+<ul>
+<li>Oracle Autonomous Database (ADB or ATP)</li>
+<li>Oracle Database 19c or later</li>
+</ul></li>
+<li><p>An Integrated Development Environment capable of installing the
+required project dependencies via NPM</p>
+<ul>
+<li><p>You will need the following packages to follow along:</p>
+<ul>
+<li><code>dotenv</code></li>
+<li><code>express</code></li>
+<li><code>node-fetch</code></li>
+</ul></li>
+<li><p>From within your project root folder, install these packages with
+the following command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install express dotenv node-fetch</span></code></pre></div></li>
+</ul></li>
+</ol>
+<h3 id="configuration">Configuration</h3>
+<p>Additional configuration will be required in three areas:</p>
+<ol type="1">
+<li>Identity Domain</li>
+<li>ORDS</li>
+<li>IDE/Project Folder</li>
+</ol>
+<h4 id="identity-domain">Identity Domain</h4>
+<p>You will need to create and configure two Integrated Applications in
+your Identity Domain. In this example, we use:</p>
+<ol type="1">
+<li><code>ords-jwt-demo-app</code></li>
+<li><code>manage-claims-app</code></li>
+</ol>
+<h5 id="configuring-the-ords-jwt-demo-app-application">Configuring the
+<code>ords-jwt-demo-app</code> application</h5>
+<p>This <code>ords-jwt-demo-app</code> is a Confidential Application
+type. The Resource server and Client configuration settings used for
+this Integrated Application are included for your reference. You may
+copy these settings to better follow along.</p>
+<h6 id="resource-server-configuration">Resource server
+configuration</h6>
+<ul>
+<li><strong>Access token expiration:</strong> <code>3600</code>
+(seconds)<br />
+</li>
+<li><strong>Primary Audience:</strong> <code>audience01</code><br />
+</li>
+<li><strong>Scopes:</strong> <code>iam_groups</code></li>
+</ul>
+<h6 id="client-configuration">Client configuration</h6>
+<ul>
+<li><strong>Allowed grant types:</strong>
+<code>Client credentials</code>, <code>JWT assertion</code>,
+<code>Authorization code</code>, <code>Implicit</code></li>
+<li><strong>Allow non-HTTPS URLs:</strong> <code>Enabled</code></li>
+<li><strong>Redirect URL:</strong>
+<code>http://localhost:3000/callback</code>
+<code>https://insomnia.rest</code>
+<code>https://oauth.pstmn.io/v1/callback</code></li>
+<li><strong>Client type:</strong> <code>Confidential</code></li>
+<li><strong>Client IP address:</strong> <code>Anywhere</code></li>
+<li><strong>Token issuance policy: Authorized resources:</strong>
+<code>All</code></li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> We use the Authorization code grant type;
+others are included for convenience.</p>
+</blockquote>
+<h6 id="groups">Groups</h6>
+<p>The <code>ords-jwt-demo-app</code> has two Groups:</p>
+<ul>
+<li><code>alphagroup</code></li>
+<li><code>betagroup</code></li>
+</ul>
+<p>For demonstration purposes, each group will have two users:</p>
+<ul>
+<li><code>alphauser</code></li>
+<li><code>betauser</code></li>
+</ul>
+<p>In a later section, you will see how these users are mapped to ORDS
+Roles. Those Roles will then be assigned to ORDS Privileges, which will
+be used when validating the OCI IAM JSON Web Token.</p>
+<h5 id="configuring-the-manage-claims-app-application">Configuring the
+<code>manage-claims-app</code> application</h5>
+<p>You must update the claims in your Identity Domain to include
+user-created custom claims. Adding these claims will ensure they are
+included in the JWTs from your Identity Domain.</p>
+<p>You must configure a separate <em>administrative</em> Integrated
+Application (in this example, we create the
+<code>manage-claims-app</code> application for this process) to complete
+this task. After completing the steps in <a
+href="https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/Content/Identity/api-getstarted/OATOAuthClientWebApp.htm">this
+tutorial</a>, you will be issued an Access Token. You will then use this
+token to update your Identity Domain’s claims to include a new Custom
+Claim.</p>
+<p>Using the Access Token acquired from the tutorial, submit a
+<code>POST</code> request to the <code>/admin/v1/CustomClaims/</code>
+endpoint.</p>
+<h6 id="your-custom-claim-domain">Your Custom Claim domain</h6>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">https://</span><span class="op">&lt;</span>domainURL<span class="op">&gt;</span>/admin/v1/CustomClaims/</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Remove embedded comments in the JSON object
+below prior to issuing your <code>POST</code> request.</p>
+</blockquote>
+<h6 id="example-payload-included-in-your-post-request">Example payload
+included in your <code>POST</code> request</h6>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;schemas&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;urn:ietf:params:scim:schemas:oracle:idcs:CustomClaim&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;iam_groups&quot;</span><span class="fu">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;$user.groups.*.display&quot;</span><span class="fu">,</span> <span class="er">//</span> <span class="er">A</span> <span class="er">user</span> <span class="er">expression</span> <span class="er">which</span> <span class="er">returns</span> <span class="er">an</span> <span class="er">array</span> <span class="er">(denoted</span> <span class="er">by</span> <span class="er">the</span> <span class="dt">&quot;*&quot;</span><span class="er">)</span> <span class="er">of</span> <span class="er">the</span> <span class="er">sub-attribute</span> <span class="dt">&quot;display.&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;expression&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span>               </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;always&quot;</span><span class="fu">,</span>                 </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tokenType&quot;</span><span class="fu">:</span> <span class="st">&quot;AT&quot;</span><span class="fu">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;allScopes&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;scopes&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;audience01iam_groups&quot;</span> <span class="er">//</span> <span class="er">A</span> <span class="er">concatenation</span> <span class="er">of</span> <span class="er">the</span> <span class="er">Primary</span> <span class="er">Audience</span> <span class="er">and</span> <span class="er">Scope</span> <span class="er">of</span> <span class="er">your</span> <span class="er">target</span> <span class="er">Integrated</span> <span class="er">Application.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span>                        </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span>                          </span></code></pre></div>
+<blockquote>
+<p>Learn more: <a
+href="https://www.rfc-editor.org/rfc/rfc7643.html">System for
+Cross-domain Identity Management (SCIM) specifications</a></p>
+</blockquote>
+<h6 id="sample-curl-command">Sample <code>curl</code> command</h6>
+<p>An example cURL command to your <code>/admin/v1/CustomClaims/</code>
+endpoint (in our demo, we perform this in the Insomnia API testing
+application).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--request</span> POST <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--url</span> https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--header</span> <span class="st">&#39;Authorization: Bearer [Your Access Token]&#39;</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--header</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--data</span> <span class="st">&#39;{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;schemas&quot;: [</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">        &quot;urn:ietf:params:scim:schemas:oracle:idcs:CustomClaim&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">    ],</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;name&quot;: &quot;iam_groups&quot;,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;value&quot;: &quot;$user.groups.*.display&quot;,     </span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;expression&quot;: true,</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;mode&quot;: &quot;always&quot;,</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;tokenType&quot;: &quot;AT&quot;,</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;allScopes&quot;: false,</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;scopes&quot;: [</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;audience01iam_groups&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="st">}&#39;</span></span></code></pre></div>
+<p>![Updating custom claims in
+IAM](./blogimages/2-updating-iam-custom-claims.png ” “)</p>
+<p>You will receive an <code>HTTP/1.1 201 Created</code> response after
+your <code>POST</code> request is complete. You may also issue a
+subsequent <code>GET</code> request to the same endpoint to review these
+changes.</p>
+<h6 id="example-get-request">Example <code>GET</code> request</h6>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--request</span> GET <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--url</span> https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/admin/v1/CustomClaims/ <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--header</span> <span class="st">&#39;Authorization: Bearer [Your Access Token]&#39;</span> <span class="dt">\</span></span></code></pre></div>
+<p>With the configuration complete, we can configure the ORDS Resource
+Modules, JWT Profile, Roles, and Privileges.</p>
+<h4 id="ords">ORDS</h4>
+<p>You can use the following definitions to reproduce this
+demonstration.</p>
+<blockquote>
+<p><strong>Note:</strong> We assume you have an existing REST-enabled
+schema.</p>
+</blockquote>
+<h5 id="resource-module">Resource Module</h5>
+<p>As the user, execute the following PL/SQL Schema import (this can be
+accomplished via <a
+href="https://www.oracle.com/database/sqldeveloper/technologies/sqlcl/">SQLcl</a>,
+<a
+href="https://docs.oracle.com/en/database/oracle/sql-developer-web/25.1/sdweb/signing-database-actions.html">SQL
+Developer Web</a>, or <a
+href="https://www.oracle.com/database/sqldeveloper/vscode/">SQL
+Developer for VS Code</a>).</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DECLARE</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  l_roles     OWA.VC_ARR;</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  l_modules   OWA.VC_ARR;</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  l_patterns  OWA.VC_ARR;</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_MODULE(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      p_base_path      <span class="op">=&gt;</span> <span class="st">&#39;/alpha_v1/&#39;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      p_items_per_page <span class="op">=&gt;</span> <span class="dv">25</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      p_status         <span class="op">=&gt;</span> <span class="st">&#39;PUBLISHED&#39;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_TEMPLATE(</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      p_pattern        <span class="op">=&gt;</span> <span class="st">&#39;alpha_group&#39;</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      p_priority       <span class="op">=&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      p_etag_type      <span class="op">=&gt;</span> <span class="st">&#39;HASH&#39;</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      p_etag_query     <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_HANDLER(</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      p_pattern        <span class="op">=&gt;</span> <span class="st">&#39;alpha_group&#39;</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      p_method         <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>      p_source_type    <span class="op">=&gt;</span> <span class="st">&#39;plsql/block&#39;</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>      p_mimes_allowed  <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      p_source         <span class="op">=&gt;</span> </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;DECLARE</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="st">    l_date VARCHAR2(100);</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="st">    l_user varchar2(100);</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="st">    l_status varchar2(100);</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="st">BEGIN</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="st">    l_user := :current_user;</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="st">        SYSTIMESTAMP, :current_user</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="st">    INTO l_date, l_user</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="st">        DUAL;</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="st">    :dbActual := l_date;</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="st">    :crtUser := l_user;</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="st">END;&#39;</span>);</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PARAMETER(</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>      p_module_name        <span class="op">=&gt;</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>,</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>      p_pattern            <span class="op">=&gt;</span> <span class="st">&#39;alpha_group&#39;</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>      p_method             <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>      p_name               <span class="op">=&gt;</span> <span class="st">&#39;dbActual&#39;</span>,</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>      p_bind_variable_name <span class="op">=&gt;</span> <span class="st">&#39;dbActual&#39;</span>,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>      p_source_type        <span class="op">=&gt;</span> <span class="st">&#39;RESPONSE&#39;</span>,</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>      p_param_type         <span class="op">=&gt;</span> <span class="st">&#39;STRING&#39;</span>,</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>      p_access_method      <span class="op">=&gt;</span> <span class="st">&#39;OUT&#39;</span>,</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>      p_comments           <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PARAMETER(</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>      p_module_name        <span class="op">=&gt;</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>,</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>      p_pattern            <span class="op">=&gt;</span> <span class="st">&#39;alpha_group&#39;</span>,</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>      p_method             <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>      p_name               <span class="op">=&gt;</span> <span class="st">&#39;crtUser&#39;</span>,</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>      p_bind_variable_name <span class="op">=&gt;</span> <span class="st">&#39;crtUser&#39;</span>,</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>      p_source_type        <span class="op">=&gt;</span> <span class="st">&#39;RESPONSE&#39;</span>,</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>      p_param_type         <span class="op">=&gt;</span> <span class="st">&#39;STRING&#39;</span>,</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>      p_access_method      <span class="op">=&gt;</span> <span class="st">&#39;OUT&#39;</span>,</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>      p_comments           <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_MODULE(</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;beta.group.module.v1&#39;</span>,</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>      p_base_path      <span class="op">=&gt;</span> <span class="st">&#39;/beta_v1/&#39;</span>,</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>      p_items_per_page <span class="op">=&gt;</span> <span class="dv">25</span>,</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>      p_status         <span class="op">=&gt;</span> <span class="st">&#39;PUBLISHED&#39;</span>,</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_TEMPLATE(</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;beta.group.module.v1&#39;</span>,</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>      p_pattern        <span class="op">=&gt;</span> <span class="st">&#39;beta_group&#39;</span>,</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>      p_priority       <span class="op">=&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>      p_etag_type      <span class="op">=&gt;</span> <span class="st">&#39;HASH&#39;</span>,</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>      p_etag_query     <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_HANDLER(</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>      p_module_name    <span class="op">=&gt;</span> <span class="st">&#39;beta.group.module.v1&#39;</span>,</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>      p_pattern        <span class="op">=&gt;</span> <span class="st">&#39;beta_group&#39;</span>,</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>      p_method         <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>      p_source_type    <span class="op">=&gt;</span> <span class="st">&#39;plsql/block&#39;</span>,</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>      p_items_per_page <span class="op">=&gt;</span> <span class="dv">25</span>,</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>      p_mimes_allowed  <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>      p_source         <span class="op">=&gt;</span> </span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;DECLARE</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a><span class="st">    l_date VARCHAR2(100);</span></span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a><span class="st">    l_user varchar2(100);</span></span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a><span class="st">    l_status varchar2(100);</span></span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a><span class="st">BEGIN</span></span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a><span class="st">    l_user := :current_user;</span></span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT</span></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a><span class="st">        SYSTIMESTAMP, :current_user</span></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a><span class="st">    INTO l_date, l_user</span></span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM</span></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="st">        DUAL;</span></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a><span class="st">    :dbActual := l_date;</span></span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a><span class="st">    :crtUser := l_user;</span></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a><span class="st">END;&#39;</span>);</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PARAMETER(</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>      p_module_name        <span class="op">=&gt;</span> <span class="st">&#39;beta.group.module.v1&#39;</span>,</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>      p_pattern            <span class="op">=&gt;</span> <span class="st">&#39;beta_group&#39;</span>,</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>      p_method             <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>      p_name               <span class="op">=&gt;</span> <span class="st">&#39;crtUser&#39;</span>,</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>      p_bind_variable_name <span class="op">=&gt;</span> <span class="st">&#39;crtUser&#39;</span>,</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>      p_source_type        <span class="op">=&gt;</span> <span class="st">&#39;RESPONSE&#39;</span>,</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>      p_param_type         <span class="op">=&gt;</span> <span class="st">&#39;STRING&#39;</span>,</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>      p_access_method      <span class="op">=&gt;</span> <span class="st">&#39;OUT&#39;</span>,</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>      p_comments           <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PARAMETER(</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>      p_module_name        <span class="op">=&gt;</span> <span class="st">&#39;beta.group.module.v1&#39;</span>,</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>      p_pattern            <span class="op">=&gt;</span> <span class="st">&#39;beta_group&#39;</span>,</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>      p_method             <span class="op">=&gt;</span> <span class="st">&#39;GET&#39;</span>,</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>      p_name               <span class="op">=&gt;</span> <span class="st">&#39;dbActual&#39;</span>,</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>      p_bind_variable_name <span class="op">=&gt;</span> <span class="st">&#39;dbActual&#39;</span>,</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>      p_source_type        <span class="op">=&gt;</span> <span class="st">&#39;RESPONSE&#39;</span>,</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>      p_param_type         <span class="op">=&gt;</span> <span class="st">&#39;STRING&#39;</span>,</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>      p_access_method      <span class="op">=&gt;</span> <span class="st">&#39;OUT&#39;</span>,</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>      p_comments           <span class="op">=&gt;</span> <span class="kw">NULL</span>);</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>  ORDS.CREATE_ROLE(p_role_name <span class="op">=&gt;</span> <span class="st">&#39;alphagroup&#39;</span>);</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>  ORDS.CREATE_ROLE(p_role_name <span class="op">=&gt;</span> <span class="st">&#39;betagroup&#39;</span>);</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>  l_roles(<span class="dv">1</span>) <span class="op">:=</span> <span class="st">&#39;alphagroup&#39;</span>;</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>  l_modules(<span class="dv">1</span>) <span class="op">:=</span> <span class="st">&#39;alpha.group.module.v1&#39;</span>;</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PRIVILEGE(</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>      p_privilege_name <span class="op">=&gt;</span> <span class="st">&#39;alphagroup&#39;</span>,</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>      p_roles          <span class="op">=&gt;</span> l_roles,</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>      p_patterns       <span class="op">=&gt;</span> l_patterns,</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>      p_modules        <span class="op">=&gt;</span> l_modules,</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>      p_label          <span class="op">=&gt;</span> <span class="st">&#39;alphagroup&#39;</span>,</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>      p_description    <span class="op">=&gt;</span> <span class="st">&#39;alphagroup&#39;</span>,</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="st">&#39;alphagroup&#39;</span>); </span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>  l_roles.<span class="kw">DELETE</span>;</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>  l_modules.<span class="kw">DELETE</span>;</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>  l_patterns.<span class="kw">DELETE</span>;</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>  l_roles(<span class="dv">1</span>) <span class="op">:=</span> <span class="st">&#39;betagroup&#39;</span>;</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>  l_modules(<span class="dv">1</span>) <span class="op">:=</span> <span class="st">&#39;beta.group.module.v1&#39;</span>;</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>  ORDS.DEFINE_PRIVILEGE(</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a>      p_privilege_name <span class="op">=&gt;</span> <span class="st">&#39;betagroup&#39;</span>,</span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>      p_roles          <span class="op">=&gt;</span> l_roles,</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>      p_patterns       <span class="op">=&gt;</span> l_patterns,</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>      p_modules        <span class="op">=&gt;</span> l_modules,</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>      p_label          <span class="op">=&gt;</span> <span class="st">&#39;betagroup&#39;</span>,</span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>      p_description    <span class="op">=&gt;</span> <span class="st">&#39;betagroup&#39;</span>,</span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>      p_comments       <span class="op">=&gt;</span> <span class="st">&#39;betagroup&#39;</span>); </span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>  l_roles.<span class="kw">DELETE</span>;</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>  l_modules.<span class="kw">DELETE</span>;</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>  l_patterns.<span class="kw">DELETE</span>;</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>          </span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a><span class="kw">COMMIT</span>;</span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<p>You will now have two Resource Modules:</p>
+<ul>
+<li><code>/ords/[Your schema]/alpha_v1/alpha_group</code></li>
+<li><code>/ords/[Your schema]/beta_v1/beta_group</code></li>
+</ul>
+<p>In this demonstration, we perform a <code>GET</code> request is on
+each endpoint. The response would include values for the current
+<code>SYSTIMESTAMP</code> and for the ORDS <code>:current_user</code>
+Implicit Parameter.</p>
+<h5 id="roles">Roles</h5>
+<p>You will also notice two Roles:</p>
+<ul>
+<li><code>alphagroup</code></li>
+<li><code>betagroup</code></li>
+</ul>
+<h5 id="privileges">Privileges</h5>
+<p>Each Role can then be assigned to an ORDS Privilege. You will now
+have the following privileges:</p>
+<ul>
+<li><code>alphagroup</code></li>
+<li><code>betagroup</code></li>
+</ul>
+<h5 id="jwt-profile">JWT Profile</h5>
+<p>You must create an ORDS JWT Profile. Each schema may have only one
+valid JWT Profile at a time. The JWT can be one of:</p>
+<ul>
+<li>Scope-Based Access Control (SBAC)</li>
+<li>Role-Based Access Control (RBAC)</li>
+</ul>
+<p>When configuring custom claims in OCI IAM, you may do so with one of
+two options:</p>
+<ul>
+<li>Identity Domain’s User Attributes (additional attributes that you
+may have created)</li>
+<li>Integrated Application’s Groups (and users therein)</li>
+</ul>
+<p>This tutorial demonstrates RBAC JWT Profiles using an Integrated
+Application’s Groups. Execute the following PL/SQL procedure to
+configure your JWT Profile:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DECLARE</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    L_P_ISSUER          <span class="dt">VARCHAR2</span>(<span class="dv">200</span>) <span class="op">:=</span> <span class="st">&#39;https://identity.oraclecloud.com/&#39;</span>; <span class="co">-- You must include a trailing backslash.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    L_P_AUDIENCE        <span class="dt">VARCHAR2</span>(<span class="dv">200</span>) <span class="op">:=</span> <span class="st">&#39;audience01&#39;</span>;</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    L_P_JWK_URL         <span class="dt">VARCHAR2</span>(<span class="dv">200</span>) <span class="op">:=</span> <span class="st">&#39;https://idcs-[Your Identity Doimain Unique Identifier].identity.oraclecloud.com:443/admin/v1/SigningCert/jwk&#39;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    ;</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    L_P_DESCRIPTION     <span class="dt">VARCHAR2</span>(<span class="dv">200</span>) <span class="op">:=</span> <span class="st">&#39;ORDS RBAC JWTs demonstration&#39;</span>;</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    L_P_ROLE_CLAIM_NAME <span class="dt">VARCHAR2</span>(<span class="dv">200</span>) <span class="op">:=</span> <span class="st">&#39;/iam_groups&#39;</span>; <span class="co">-- You must include a leading backslash. ORDS will interpret this as a JSON Pointer.</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    ORDS_METADATA.ORDS_SECURITY.DELETE_JWT_PROFILE(); <span class="co">-- It is a common best practice to delete an existing JWT Profile and overwrite.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    ORDS_METADATA.ORDS_SECURITY.CREATE_JWT_PROFILE(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        P_ISSUER          <span class="op">=&gt;</span> L_P_ISSUER,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        P_AUDIENCE        <span class="op">=&gt;</span> L_P_AUDIENCE,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        P_JWK_URL         <span class="op">=&gt;</span> L_P_JWK_URL,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        P_DESCRIPTION     <span class="op">=&gt;</span> L_P_DESCRIPTION,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        P_ROLE_CLAIM_NAME <span class="op">=&gt;</span> L_P_ROLE_CLAIM_NAME</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    ); <span class="co">-- Not included here: P_ALLOWED_SKEW and P_ALLOWED_AGE. These are optional parameters; when omitted, their values are set to NULL (i.e., infinity).</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<p>![Create ORDS JWT Profile](./blogimages/3-create-jwt-profile.png ”
+“)</p>
+<p>ORDS will now expect a <code>stringArray[]</code> (which was set in
+the previous OCI IAM custom claims configuration steps)
+<code>iam_groups</code> since the <code>P_ROLE_CLAIM_NAME</code>
+parameter (i.e., JSON Pointer) was used.</p>
+<blockquote>
+<p><strong>NOTE:</strong> If no ORDS Role has been assigned to a
+Privilege, then any authenticated user with the
+<code>iam_groups[ ]</code> claim would be authorized to access one of
+these protected resources.</p>
+</blockquote>
+<p>![Json Pointer used](./blogimages/4-json-pointer.png ” “)</p>
+<blockquote>
+<p><strong>Important</strong> When an Identity Domain User, who is not
+assigned to a Group, requests an IAM JWT using the Authorization Code
+grant type, an empty string would be returned (e.g.,
+<code>iam_groups " "</code>) instead of an empty stringArray[ ] (e.g.,
+)<code>iam_groups[ ]</code>). Because of this, ORDS 25.1 will not
+authorize a privileged IAM User, despite having the correct (albeit
+empty) claim in a JWT. ORDS 25.2 and later will add support for cases
+where a roles-based claim displays an empty string or empty stringArray[
+].</p>
+</blockquote>
+<h3 id="accessing-protected-ords-resources">Accessing protected ORDS
+resources</h3>
+<p>This tutorial provides two examples for demonstrating the OAuth 2.0
+Authorization Code Flow method for obtaining a valid JWT (Access
+Token).</p>
+<p>In the first example, we use Insomnia as well as <code>cURL</code>.
+These steps will be similar for Postman and other testing tools.</p>
+<p>The second example will demonstrate with a simple single-page web
+application using JavaScript and Node.js/Express.js.</p>
+<h4 id="example-1-insomnia-and-curl">Example 1: Insomnia and
+<code>cURL</code></h4>
+<h5 id="requesting-an-authorization-code-and-acquiring-a-jwt">Requesting
+an Authorization Code and Acquiring a JWT</h5>
+<p>We have configured our Insomnia client with the following values:</p>
+<ul>
+<li><strong>Grant Type:</strong> <code>Authorization Code</code></li>
+<li><strong>Authorization URL:</strong>
+<code>https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/authorize</code></li>
+<li><strong>Access Token URL:</strong>
+<code>https://idcs-[Your Identity Domain Unique Identifier].identity.oraclecloud.com:443/oauth2/v1/token</code></li>
+<li><strong>Client ID:</strong></li>
+<li><strong>Client Secret:</strong></li>
+<li><strong>Redirect URL:</strong>
+<code>https://insomnia.rest</code></li>
+<li><strong>Scope:</strong> <code>audience01iam_groups</code></li>
+<li><strong>Credentials:</strong>
+<code>As Basic Auth Header (default)</code></li>
+</ul>
+<p>![Insomnia GET request
+values](./blogimages/5-insomnia-first-get-request-values.png ” “)</p>
+<p>With these values, a <code>GET</code> request (i.e., clicking the
+<code>Fetch Tokens</code> button) is sent to the
+<code>/oauth2/v1/authorize</code> endpoint to request an Authorization
+code.</p>
+<p>A new browser window or tab will open, enter the credentials for the
+Alpha User with:</p>
+<ul>
+<li><strong>User Name:</strong> <code>alphauser</code></li>
+<li><strong>Password:</strong>
+<code>[Password selected upon creating the alphauser]</code></li>
+</ul>
+<p>After submitting the user credentials, a <code>POST</code> request is
+sent to the <code>/oauth2/v1/token</code> endpoint to both present an
+Authorization code and exchange it for a valid JWT.</p>
+<p>You will be redirected to Insomnia (or other tool used). You may
+inspect the JWT to review the properties of the JSON payload</p>
+<h5 id="inspecting-the-jwt">Inspecting the JWT</h5>
+<p>You may use your tool of choice for decoding or inspecting a JWT.</p>
+<blockquote>
+<p><strong>Optional:</strong> Two freely available options for decoding
+JWTs are <a href="https://jwt.io">jwt.io</a> and <a
+href="https://jwt.ms">jwt.ms</a>.</p>
+</blockquote>
+<p>Notice how the <code>iam_groups</code> <code>stringArray[]</code> is
+included in the JWT. ORDS will expect this since it was included as a
+JSON Pointer in the <code>CREATE_JWT_PROFILE</code> PL/SQL
+procedure.</p>
+<p>![JSON Pointer example in sample
+JWT](./blogimages/6-json-pointer-string-array-in-jwt.png ” “)</p>
+<h6 id="example-jwt">Example JWT</h6>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;client_ocid&quot;</span><span class="fu">:</span> <span class="st">&quot;ocid1.domainapp.oc1.eu-frankfurt-1.123abc456def789ghi012jkl345mno678pqr901stu234vwx567yz&quot;</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_tz&quot;</span><span class="fu">:</span> <span class="st">&quot;America/Chicago&quot;</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub&quot;</span><span class="fu">:</span> <span class="st">&quot;alphauser&quot;</span><span class="fu">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_locale&quot;</span><span class="fu">:</span> <span class="st">&quot;en&quot;</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sidle&quot;</span><span class="fu">:</span> <span class="dv">480</span><span class="fu">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;idp_name&quot;</span><span class="fu">:</span> <span class="st">&quot;UserNamePassword&quot;</span><span class="fu">,</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user.tenant.name&quot;</span><span class="fu">:</span> <span class="st">&quot;idcs-[Your unique Tenant Identifier]&quot;</span><span class="fu">,</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;idp_guid&quot;</span><span class="fu">:</span> <span class="st">&quot;UserNamePassword&quot;</span><span class="fu">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;amr&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;USERNAME_PASSWORD&quot;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iss&quot;</span><span class="fu">:</span> <span class="st">&quot;https://identity.oraclecloud.com/&quot;</span><span class="fu">,</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;domain_home&quot;</span><span class="fu">:</span> <span class="st">&quot;eu-frankfurt-1&quot;</span><span class="fu">,</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;ca_ocid&quot;</span><span class="fu">:</span> <span class="st">&quot;ocid1.tenancy.oc1..abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz&quot;</span><span class="fu">,</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_tenantname&quot;</span><span class="fu">:</span> <span class="st">&quot;idcs-[Your unique Tenant Identifier]&quot;</span><span class="fu">,</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;client_id&quot;</span><span class="fu">:</span> <span class="st">&quot;ttylsmhrofl123456&quot;</span><span class="fu">,</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sid&quot;</span><span class="fu">:</span> <span class="st">&quot;q1w2e3r4t5y6:411abc&quot;</span><span class="fu">,</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;domain_id&quot;</span><span class="fu">:</span> <span class="st">&quot;ocid1.domain.oc1..abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz&quot;</span><span class="fu">,</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub_type&quot;</span><span class="fu">:</span> <span class="st">&quot;user&quot;</span><span class="fu">,</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;scope&quot;</span><span class="fu">:</span> <span class="st">&quot;iam_groups&quot;</span><span class="fu">,</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_ocid&quot;</span><span class="fu">:</span> <span class="st">&quot;ocid1.user.oc1..aaaaaaaane7pcss3u6urqagkcnkyzp5gdwaehiwilkzsgykhnxagnsiewnuq&quot;</span><span class="fu">,</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;client_tenantname&quot;</span><span class="fu">:</span> <span class="st">&quot;idcs-[Your unique Tenant Identifier]&quot;</span><span class="fu">,</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;region_name&quot;</span><span class="fu">:</span> <span class="st">&quot;eu-frankfurt-idcs-1&quot;</span><span class="fu">,</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_lang&quot;</span><span class="fu">:</span> <span class="st">&quot;en&quot;</span><span class="fu">,</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;exp&quot;</span><span class="fu">:</span> <span class="dv">1747065294</span><span class="fu">,</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1747061694</span><span class="fu">,</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;client_guid&quot;</span><span class="fu">:</span> <span class="st">&quot;abcdefghijk0123456789&quot;</span><span class="fu">,</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;client_name&quot;</span><span class="fu">:</span> <span class="st">&quot;ords-jwt-demo-app&quot;</span><span class="fu">,</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;idp_type&quot;</span><span class="fu">:</span> <span class="st">&quot;LOCAL&quot;</span><span class="fu">,</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tenant&quot;</span><span class="fu">:</span> <span class="st">&quot;idcs-[Your unique Tenant Identifier]&quot;</span><span class="fu">,</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;jti&quot;</span><span class="fu">:</span> <span class="st">&quot;1ab2cd3ef4gh5ij6kl7mn8op9qr&quot;</span><span class="fu">,</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;gtp&quot;</span><span class="fu">:</span> <span class="st">&quot;azc&quot;</span><span class="fu">,</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_displayname&quot;</span><span class="fu">:</span> <span class="st">&quot;alpha user&quot;</span><span class="fu">,</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;opc&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iam_groups&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;alphagroup&quot;</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub_mappingattr&quot;</span><span class="fu">:</span> <span class="st">&quot;userName&quot;</span><span class="fu">,</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;primTenant&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tok_type&quot;</span><span class="fu">:</span> <span class="st">&quot;AT&quot;</span><span class="fu">,</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;aud&quot;</span><span class="fu">:</span> <span class="st">&quot;audience01&quot;</span><span class="fu">,</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;ca_name&quot;</span><span class="fu">:</span> <span class="st">&quot;abcdef1&quot;</span><span class="fu">,</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_id&quot;</span><span class="fu">:</span> <span class="st">&quot;a1b2c3d4e5f6g7h8i9j01k2l3m4n5o6p&quot;</span><span class="fu">,</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;domain&quot;</span><span class="fu">:</span> <span class="st">&quot;ordsdomain&quot;</span><span class="fu">,</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tenant_iss&quot;</span><span class="fu">:</span> <span class="st">&quot;https://idcs-[Your unique Tenant Identifier].identity.oraclecloud.com:443&quot;</span><span class="fu">,</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;resource_app_id&quot;</span><span class="fu">:</span> <span class="st">&quot;abcdefghijk0123456789&quot;</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>We can now test two endpoints to review the expected behavior.</p>
+<h5 id="issuing-a-get-request-success">Issuing a GET request
+SUCCESS</h5>
+<p>We first issue a <code>GET</code> request to the
+<code>/alpha_v1/alpha_group</code> endpoint:</p>
+<h6 id="success-example-curl-command">Success example curl command</h6>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--request</span> GET <span class="dt">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--url</span> http://localhost:8080/ords/ordsdemo/alpha_v1/alpha_group <span class="dt">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--header</span> <span class="st">&#39;Authorization: Bearer [Replace with your JWT&#39;</span> <span class="dt">\</span></span></code></pre></div>
+<h6 id="successful-response">Successful response</h6>
+<p>You should observe the following response:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">HTTP/1.1</span> 200 OK</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span><span class="kw">;</span><span class="va">charset</span><span class="op">=</span>utf-8</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> X-ORDS_DEBUG: <span class="fu">true</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">&quot; &quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Transfer-Encoding: <span class="ex">chunked</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>   <span class="st">&quot;crtUser&quot;</span><span class="ex">:</span> <span class="st">&quot;alphauser&quot;</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>   <span class="st">&quot;dbActual&quot;</span><span class="ex">:</span> <span class="st">&quot;14-MAY-25 04.10.22.043364 PM +00:00&quot;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<p>![Successful GET request to Alpha
+endpoint](./blogimages/7-successful-get-to-alpha-as-alpha.png ” “)</p>
+<h5 id="issuing-a-get-request-failure">Issuing a GET request
+FAILURE</h5>
+<p>You can optionally test the RBAC JWT using the Alpha User and the
+<code>/ords/ordsdemo/beta_v1/beta_group</code> endpoint.</p>
+<h6 id="failure-example-curl-command">Failure example curl command</h6>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--request</span> GET <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--url</span> http://localhost:8080/ords/ordsdemo/beta_v1/beta_group <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--header</span> <span class="st">&#39;Authorization: Bearer [Replace with your JWT&#39;</span> <span class="dt">\</span></span></code></pre></div>
+<h6 id="failed-response">Failed response</h6>
+<p>You will recieve the following response in your console:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">401</span> Unauthorized</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> WWW-Authenticate: <span class="ex">Bearer</span> realm=<span class="st">&quot;Oracle REST Data Services&quot;</span>, error=<span class="st">&quot;invalid_token&quot;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">467009</span></span></code></pre></div>
+<p>Similarly, in the web browser you should see the following:</p>
+<p>![Failed GET request to the Beta
+endpoint](./blogimages/8-Failure-get-request-to-beta.png ” “)</p>
+<h2 id="wrap-up">Wrap-up</h2>
+<p>By now, you should have a better understanding of how to:</p>
+<ol type="1">
+<li>Create a custom claim from a Group in your Identity Domain’s
+Integrated Application</li>
+<li>Protect ORDS with a Role that matches a Custom Claim
+<ul>
+<li>Create the requisite JWT Profile</li>
+</ul></li>
+<li>Navigate an OAuth2.0 Authorization Code grant type (for acquiring an
+OCI IAM JWT) using a testing tool such as Insomnia and
+<code>cURL</code></li>
+</ol>
+<p>In the second part of this tutorial we will demonstrate using OCI IAM
+RBAC JWTs with ORDS endpoints.</p>
+<h3 id="resources">Resources</h3>
+<p>The following are helpful resources when working with ORDS and
+JWTs</p>
+<ul>
+<li><a
+href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/developing-REST-applications.html#GUID-B1ED4DFD-9DD4-4FBF-B91D-35373D756538">ORDS
+and JWT docs</a> (ORDS Developer’s Guide)</li>
+<li><a
+href="https://followthecoffee.com/configuring-oci-iam-domain-jwts-to-use-with-ords/">Configuring
+OCI IAM JWTs and ORDS for Scope Based Access Control (SBAC) claims</a>
+(Blog)</li>
+<li><a
+href="https://followthecoffee.com/ords-apis-and-microsoft-entra-jwts-tutorial/">Microsoft
+Entra JWTS with ORDS SBAC claims</a> (Blog)</li>
+<li><a
+href="https://followthecoffee.com/401-unauthorized-invalid_token-troubleshooting-oracle-cloud-iam-jwts-with-ords/">ORDS
+Troubleshooting a 401 invalid_token response</a> (Blog)</li>
+<li><a
+href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.1/orddg/implicit-parameters.html">About
+ORDS Implicit Parameters</a></li>
+</ul>
