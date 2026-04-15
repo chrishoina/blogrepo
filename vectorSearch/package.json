@@ -1,0 +1,9 @@
+{
+  "name": "ords-vector-search-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ORDS 26.1.0 /vectorSearch demo",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

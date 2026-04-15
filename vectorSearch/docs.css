@@ -1,0 +1,416 @@
+@font-face {
+  font-family: Geneva9;
+  src: url("fonts/FindersKeepers.woff2") format("woff2"),
+    url("fonts/FindersKeepers.woff") format("woff");
+}
+
+@font-face {
+  font-family: Chicago_12;
+  src: url("fonts/ChiKareGo2.woff2") format("woff2"),
+    url("fonts/ChiKareGo2.woff") format("woff");
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.app-desktop {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+}
+
+.menu-shell {
+  margin-bottom: 16px;
+}
+
+.menu-bar {
+  align-items: stretch;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  width: 100%;
+}
+
+.menu-button {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+.workspace {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.site-attribution {
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.main-window {
+  width: min(100%, 1360px);
+}
+
+.app-pane {
+  overflow-y: auto;
+}
+
+.search-panel {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+  padding: 8px 0 12px;
+}
+
+.search-form {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 1120px);
+}
+
+.search-form .field-row,
+.quick-picks-panel,
+.search-actions {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.search-form .field-row {
+  flex-wrap: nowrap;
+}
+
+#freeText {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.status-copy {
+  display: block;
+  min-height: 1.25rem;
+}
+
+.pane-copy {
+  margin-top: 0;
+  text-align: center;
+}
+
+.section-title {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.quick-picks-panel {
+  width: min(100%, 1200px);
+}
+
+.quick-picks {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(220px, 280px));
+  align-items: stretch;
+  justify-content: center;
+}
+
+.quick-picks .btn {
+  width: 100%;
+  text-align: center;
+}
+
+.results-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.results-panel .details-bar {
+  margin-bottom: 6px;
+}
+
+.results-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.results-table {
+  overflow: auto;
+}
+
+.results-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table th,
+.results-table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #000;
+}
+
+.header-with-action {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.info-button {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  height: 1.5rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 1.5rem;
+}
+
+.popup-backdrop {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 1000;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.popup-copy {
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+  width: 100%;
+}
+
+.results-table th:nth-child(1),
+.results-table th:nth-child(2),
+.results-table th:nth-child(4),
+.results-table td:nth-child(1),
+.results-table td:nth-child(2),
+.results-table td:nth-child(4) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.results-table p {
+  margin: 0;
+}
+
+/* Layout: */
+
+.col-main {
+  flex: 1;
+}  
+
+.col-complementary {
+  flex: 1;
+}
+
+@media (max-width: 960px) {
+  .quick-picks {
+    grid-template-columns: repeat(2, minmax(220px, 280px));
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-bar {
+    flex-direction: column;
+  }
+
+  .quick-picks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+aside {
+  width: 200px;
+  position: sticky;
+  top: 18px;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;
+  height: calc(100vh - 36px);
+}
+
+html {
+  font-family: "Inconsolata", Menlo, Chicago, Geneva;
+  font-size: 18px;
+  letter-spacing: -0.025em;
+  min-height: 100vh;
+}
+
+h3 {
+  font-family: Chicago;
+  font-size: 1.5em;
+}
+
+.heading {
+  font-size: 3rem;
+}
+
+.desc {
+  font-family: Geneva_9;
+  font-size: 2em;
+}
+
+
+.center {
+  text-align: center;
+}
+
+.component {
+  display: flex;
+  margin-top: 24px;
+  font-family: Geneva;
+  font-size: 1em;
+}
+
+.alert-text,
+.dialog-text,
+.modal-text,
+.modeless-text {
+  font-family: Chicago_12;
+  font-size: 1em;
+  font-weight: normal;
+}
+
+.dialog-text {
+  margin-top: 20px;
+}
+
+.modal-text, .alert-text {
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+
+p {
+  font-family: Geneva;
+  font-size: 0.9em;
+}
+
+
+blockquote {
+  margin: 0 0 20px;
+  padding: 20px;
+  width: 80%;
+  font-size: 14px;
+  border: 1px solid black;
+}
+
+blockquote footer {
+  margin: 12px 0 0 12px;
+}
+
+.example {
+  margin: 16px;
+  padding: 12px 24px;
+  border-left: 1px solid #000000;
+}
+
+summary {
+  font-size: 14px;
+  padding-top: 10px;
+  cursor: pointer;
+  margin: 12px 0 0 0;
+  width: 30%;
+}
+
+pre {
+  font-size: 13px;
+}
+
+.modal-dialog {
+  width: 50%;
+}
+
+.btn.active {
+  background: black;
+  border-radius:6px;
+  color: white;
+  font-family: Chicago_12;
+}
+
+.square {
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border: 1.5px solid black;
+  padding-right: 46px;
+}
+
+.menu-items {
+  padding: 0;
+  font-size: 14px;
+}
+
+/* responsive shiz */
+@media only screen and (min-width: 640px) {
+  .layout {
+    display: flex;
+    justify-content: space-between;
+  }
+  .standard-dialog {
+    margin-right: 20px;
+    margin-top: 18px;
+  }
+  .sidebar {
+    z-index: 1;
+  }
+
+  .workspace {
+    min-height: calc(100vh - 110px);
+    align-items: center;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .app-desktop {
+    padding: 12px;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+  .example {
+    margin: 0px;
+  }
+  .component {
+    display: contents;
+  }
+  .scale-down {
+    transform: scale(0.8);
+  }
+
+  .search-form .field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quick-picks {
+    grid-template-columns: 1fr;
+  }
+}

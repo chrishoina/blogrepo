@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORDS + Oracle Vector Search</title>
+  <link rel="stylesheet" href="https://unpkg.com/@sakun/system.css" />
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/docs.css">
+</head>
+<body>
+  <main class="app-desktop">
+    <nav class="menu-shell" aria-label="Application">
+      <div class="menu-bar">
+        <button
+          class="btn menu-button"
+          type="button"
+          data-nav-url="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/26.1/orddg/developing-REST-applications.html#GUID-E105F5CC-6F09-4848-A0D5-6384EDE2B19B"
+          data-nav-target="_blank"
+        >
+          Docs: ORDS vectorSearch
+        </button>
+        <button
+          class="btn menu-button"
+          type="button"
+          data-nav-url="/api-docs/"
+          data-nav-target="_blank"
+        >
+          OpenAPI Spec: new ORDS /Vector Database endpoints
+        </button>
+        <button
+          class="btn menu-button"
+          type="button"
+          data-nav-url="https://livelabs.oracle.com/ords/r/dbpm/livelabs/view-workshop?wid=4166"
+          data-nav-target="_blank"
+        >
+          LiveLabs: Explore Vectors
+        </button>
+      </div>
+    </nav>
+
+    <section class="workspace">
+      <section class="window main-window">
+        <div class="title-bar">
+          <button aria-label="Close" class="close"></button>
+          <h1 class="title">ORDS 26.1.0 /vectorSearch: Exploring National Parks</h1>
+          <button aria-label="Resize" disabled class="hidden"></button>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="window-pane app-pane">
+          <section id="searchPanel" class="search-panel">
+            <form id="searchView" class="modeless-dialog search-form">
+              <p class="modeless-text">
+                Try searching National Parks with a phrase, keyword/s, or something to do <i>or see</i>.
+              </p>
+
+              <section class="field-row">
+                <label for="freeText" class="modeless-text">Find:</label>
+                <input
+                  id="freeText"
+                  name="freeText"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Mountain hiking trails surrounded by tall trees."
+                >
+              </section>
+
+              <section class="field-row search-actions">
+                <button id="submitButton" class="btn btn-default" type="submit">Search</button>
+              </section>
+
+              <output id="statusMessage" class="modeless-text status-copy" aria-live="polite"></output>
+            </form>
+
+            <section class="quick-picks-panel">
+              <h2 class="section-title">Quick Picks</h2>
+              <p class="pane-copy">Test with a sample prompt instead.</p>
+              <div class="quick-picks" aria-label="Suggested prompts">
+                <button class="btn" type="button" data-query="Mountains with hiking trails">
+                  Mountains with hiking trails
+                </button>
+                <button class="btn" type="button" data-query="Sand dunes and beaches">
+                  Sand dunes and beaches
+                </button>
+                <button class="btn" type="button" data-query="Deserts and related wildlife">
+                  Deserts and related wildlife
+                </button>
+                <button class="btn" type="button" data-query=" Open plains and tall grasses">
+                  Open plains and tall grasses
+                </button>
+                <button class="btn" type="button" data-query="Historic forts, battlefields, and memorials">
+                  Historic forts, battlefields, and memorials
+                </button>
+                <button class="btn" type="button" data-query="Caves, narrows, and caverns">
+                  Caves, narrows, and caverns
+                </button>
+              </div>
+            </section>
+          </section>
+
+          <section id="resultsView" class="results-panel" hidden>
+            <div class="details-bar">
+              <span id="resultsSummary">Awaiting results...</span>
+              <span>Results sorted by Cosine similarity</span>
+            </div>
+
+            <div class="results-actions">
+              <button id="restartButton" class="btn" type="button">New Search</button>
+            </div>
+
+            <div class="results-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <span class="header-with-action">
+                        <span>Distance</span>
+                        <button
+                          id="distanceInfoButton"
+                          class="info-button"
+                          type="button"
+                          aria-haspopup="dialog"
+                          aria-controls="distanceInfoDialog"
+                          aria-label="Explain cosine distance"
+                        >
+                          ?
+                        </button>
+                      </span>
+                    </th>
+                    <th scope="col">Park Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">URL</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </section>
+
+    <p class="site-attribution">
+      Styled with
+      <a href="https://github.com/sakofchit/system.css" target="_blank" rel="noopener noreferrer">
+        system.css by sakofchit
+      </a>
+    </p>
+  </main>
+
+  <section
+    id="distanceInfoDialog"
+    class="popup-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="distanceInfoTitle"
+    hidden
+  >
+    <div class="modal-dialog outer-border" style="width: min(30rem, 100%);">
+      <div class="inner-border center">
+        <div class="modal-contents">
+          <h1 id="distanceInfoTitle">What Distance Means</h1>
+          <p>
+            This table is sorted by Cosine distance, which compares the angle/s of two vectors:
+            your query and a given park's description.
+          </p>
+          <p>
+            A smaller vector "distance" can indicate similarity (i.e., a "semantic match"). 
+            In this example, a smaller number would indicate a more relevant park description, relative to your search query.
+          </p>
+         <p>
+            Still scratching your head? Watch about 30 seconds of the clip below (its already cued up), then come back.
+          </p>
+          <section class="field-row popup-actions">
+            <a
+              href="https://www.youtube.com/watch?v=YDdKiQNw80c&t=439s"
+              class="btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Watch clip
+            </a>
+            <button id="closeDistanceInfoButton" class="btn" type="button">Close</button>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>
