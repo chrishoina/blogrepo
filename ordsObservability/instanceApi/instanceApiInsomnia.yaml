@@ -1,0 +1,130 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: instanceApi
+meta:
+  id: wrk_ecedbc3777e44aa2b45012fd3b501d80
+  created: 1778263181380
+  modified: 1778270341006
+  description: ""
+collection:
+  - url: http://localhost:8080/ords/_/instance-api/stable/database-pools-cache/default,local
+    name: /database-pools-cache/{pool},{type}
+    meta:
+      id: req_457da2a30e6f40ca922b6ffef650ea03
+      created: 1778263199930
+      modified: 1778596869975
+      isPrivate: false
+      description: ""
+      sortKey: -1778263260940.25
+    method: GET
+    headers:
+      - name: accept
+        value: application/json
+    authentication:
+      type: basic
+      useISO88591: false
+      username: instanceApi
+      password: 
+      disabled: true
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/ords/_/instance-api/stable/database-pools-cache
+    name: /database-pools-cache
+    meta:
+      id: req_734ef8eaede042f18b5bfed3088a4777
+      created: 1778263221748
+      modified: 1778596874108
+      isPrivate: false
+      description: ""
+      sortKey: -1778263264867.5
+    method: GET
+    headers:
+      - name: accept
+        value: application/json
+    authentication:
+      type: basic
+      useISO88591: false
+      username: instanceApi
+      password: 
+      disabled: true
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/ords/_/instance-api/stable/database-pools-cache/default,local,
+    name: /database-pools-cache/{pool},{type},{service}
+    meta:
+      id: req_5d529659e86e4d42b122ce182228745b
+      created: 1778263257013
+      modified: 1778596876341
+      isPrivate: false
+      description: ""
+      sortKey: -1778263257013
+    method: GET
+    headers:
+      - name: accept
+        value: application/json
+    authentication:
+      type: basic
+      useISO88591: false
+      username: instanceApi
+      password: 
+      disabled: true
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/ords/_/instance-api/stable/status
+    name: /status
+    meta:
+      id: req_31d3b207a42942edb61eb1d4f59da570
+      created: 1778263272722
+      modified: 1778596872604
+      isPrivate: false
+      description: ""
+      sortKey: -1778263272722
+    method: GET
+    headers:
+      - name: accept
+        value: application/json
+    authentication:
+      type: basic
+      useISO88591: false
+      username: instanceApi
+      password: 
+      disabled: true
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_053f00cc98d511302eb8f860c7714bf1686e2182
+    created: 1778263181384
+    modified: 1778263181384
+environments:
+  name: Base Environment
+  meta:
+    id: env_053f00cc98d511302eb8f860c7714bf1686e2182
+    created: 1778263181383
+    modified: 1778263181383
+    isPrivate: false
