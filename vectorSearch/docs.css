@@ -87,6 +87,17 @@ body {
   flex-wrap: nowrap;
 }
 
+.model-select-row {
+  align-items: center;
+  width: 100%;
+}
+
+.model-select-row select {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
 #freeText {
   flex: 1 1 auto;
   min-width: 0;
@@ -97,6 +108,17 @@ body {
 .status-copy {
   display: block;
   min-height: 1.25rem;
+}
+
+.search-actions {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.inline-model-status {
+  flex: 0 1 auto;
+  min-height: 0;
 }
 
 .pane-copy {
