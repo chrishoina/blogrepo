@@ -1,0 +1,236 @@
+# OCI Resource Manager schema for the ORDS Terraform bootstrap stack.
+# This file must remain in the configuration root when uploading the stack.
+title: "ORDS High-Availability Terraform Stack"
+description: "Deploys ORDS for High-Availabilty."
+stackDescription: "Creates a LB, VCN, ORDS nodes, PDBs, NSGs, and subnets."
+informationalText: "Rotate passwords after deployment."
+schemaVersion: "1.1.0"
+version: "1.0"
+locale: "en"
+logoUrl: ""
+
+variableGroups:
+  # Resource Manager injects this reserved variable from the signed-in tenancy.
+  # It is context for the stack rather than a user-selectable deployment input.
+  - title: "Resource Manager context"
+    visible: false
+    variables:
+      - ${tenancy_ocid}
+  - title: "Deployment location"
+    variables:
+      - ${region}
+      - ${compartment_ocid}
+      - ${availability_domain}
+  - title: "Access and credentials"
+    variables:
+      - ${rest_schema_username}
+      - ${ords_auto_rest_auth}
+  - title: "ORDS compute configuration"
+    variables:
+      - ${ords_node_count}
+      - ${compute_shape}
+      - ${compute_ocpus}
+      - ${compute_memory_in_gbs}
+      - ${compute_operating_system}
+      - ${compute_operating_system_version}
+      - ${compute_image_ocid}
+  - title: "Database configuration"
+    variables:
+      - ${database_version}
+      - ${database_shape}
+      - ${database_cpu_core_count}
+      - ${database_edition}
+      - ${database_license_model}
+  - title: "Resource tags"
+    variables:
+      - ${tags}
+
+variables:
+  tenancy_ocid:
+    type: string
+    title: "Tenancy OCID"
+    description: "Current OCI tenancy, supplied automatically by Resource Manager."
+    required: true
+    visible: false
+
+  region:
+    type: oci:identity:region:name
+    title: "Region"
+    description: "Required OCI region in which to create the stack."
+    required: true
+
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "Compartment"
+    description: "Compartment in which to create the deployment resources."
+    required: true
+
+  availability_domain:
+    type: oci:identity:availabilitydomain:name
+    title: "Primary availability domain"
+    description: "Optional override for mydb and the first ORDS node."
+    required: false
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  rest_schema_username:
+    type: string
+    title: "Pre-provisioned REST-enabled schema (user)"
+    description: "A REST-enabled schema is created, in all PDBs, during the initial ORDS terraform. Default is ORDSDEMO."
+    required: true
+    default: "ORDSDEMO"
+    pattern: "^[A-Za-z][A-Za-z0-9_$#]{0,127}$"
+
+  ords_auto_rest_auth:
+    type: boolean
+    title: "Set ORDS Metadata Catalog access to private"
+    description: "Default is false (open to public). The Metadata Catalog for the REST-enabled schema is publically-accessible (i.e. your user's ORDS API catalog)."
+    required: true
+    default: false
+
+  ords_node_count:
+    type: number
+    title: "ORDS node count"
+    description: "Number of ORDS compute nodes. One ORDS node per compute instance. Default is 2."
+    required: true
+    default: 2
+    minimum: 1
+    maximum: 200
+
+  compute_shape:
+    type: oci:core:instanceshape:name
+    title: "ORDS node / compute instance shape"
+    description: "Flexible VM shape used by every ORDS node."
+    required: true
+    default: "VM.Standard.E5.Flex"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  compute_ocpus:
+    type: number
+    title: "OCPUs per node"
+    description: "OCPUs assigned to each ORDS node."
+    required: true
+    default: 1
+    minimum: 1
+
+  compute_memory_in_gbs:
+    type: number
+    title: "Memory per node (GB)"
+    description: "Memory assigned to each ORDS node in GB."
+    required: true
+    default: 12
+    minimum: 1
+
+  compute_operating_system:
+    type: string
+    title: "Default compute operating system"
+    description: "Operating system used to discover the default image when no image OCID is supplied."
+    required: true
+    default: "Oracle Linux"
+
+  compute_operating_system_version:
+    type: string
+    title: "Default compute operating system version"
+    description: "Optional operating-system version used to discover the default image. Leave empty to select the latest compatible image."
+    required: false
+
+  compute_image_ocid:
+    type: oci:core:image:id
+    title: "Compute image override"
+    description: "Optional image OCID. Leave empty to select the latest compatible Oracle Linux image."
+    required: false
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      shape: ${compute_shape}
+      operatingSystem: ${compute_operating_system}
+      operatingSystemVersion: ${compute_operating_system_version}
+
+  database_version:
+    type: string
+    title: "Database version"
+    description: "Leave empty. Default is to select OCI's latest non-preview release."
+    required: false
+
+  database_shape:
+    type: enum
+    title: "Database system shape"
+    description: "Select an ECPU-based flexible or fixed VM.Standard2 shape. Availability varies by region, database version, and edition."
+    required: true
+    default: "VM.BaseDB.x86"
+    enum:
+      - "VM.BaseDB.x86"
+      - "VM.Standard.x86"
+      - "VM.Standard2.1"
+      - "VM.Standard2.2"
+      - "VM.Standard2.4"
+      - "VM.Standard2.8"
+      - "VM.Standard2.16"
+      - "VM.Standard2.24"
+
+  database_cpu_core_count:
+    type: number
+    title: "Database ECPU count"
+    description: "Default VM.BaseDB.x86 allocation is 16 ECPUs and 32 GB memory."
+    required: true
+    default: 16
+    minimum: 1
+    maximum: 256
+
+  database_edition:
+    type: enum
+    title: "Database edition"
+    description: "OCI Base Database software edition."
+    required: true
+    default: "ENTERPRISE_EDITION"
+    enum:
+      - "STANDARD_EDITION"
+      - "ENTERPRISE_EDITION"
+      - "ENTERPRISE_EDITION_HIGH_PERFORMANCE"
+
+  database_license_model:
+    type: enum
+    title: "Database license model"
+    description: "License model for the Base Database System."
+    required: true
+    default: "LICENSE_INCLUDED"
+    enum:
+      - "LICENSE_INCLUDED"
+      - "BRING_YOUR_OWN_LICENSE"
+
+  tags:
+    type: map
+    valueType: tag_value
+    title: "Freeform tags"
+    description: "Freeform tags applied to supported resources."
+    default: '{"Stack":"ords-terraform-bootstrap"}'
+
+  tag_value:
+    type: string
+    visible: false
+
+outputs:
+  ords_pdb1_landing_page:
+    displayText: "ORDS PDB1 Landing Page"
+    title: "ORDS PDB1 Landing Page"
+    type: link
+  ords_pdb2_landing_page:
+    displayText: "ORDS PDB2 Landing Page"
+    title: "ORDS PDB2 Landing Page"
+    type: link
+  generated_rest_schema_password:
+    title: "REST-enabled user password"
+    type: copyableString
+    # sensitive: true
+  generated_db_admin_password:
+    title: " SYS, SYSTEM, PDB Admin, and TDE Wallet password"
+    type: copyableString
+    sensitive: true
+  generated_ssh_private_key:
+    title: "SSH private key"
+    type: copyableString
+    sensitive: true
+  generated_ords_proxy_password:
+    title: "ORDS Public User password"
+    type: copyableString
+    sensitive: true

@@ -1,0 +1,50 @@
+# Copy to terraform.tfvars and replace every placeholder. Do not commit terraform.tfvars.
+region              = "replace-with-your-region"
+compartment_ocid    = "ocid1.compartment.oc1..replace-me"
+
+# A stack-specific RSA SSH key pair is generated automatically and installed on
+# every ORDS compute instance and the Base Database System.
+
+# Leave database_version unset (the default) to select OCI's latest non-preview
+# release for the chosen region, shape, and LVM storage. Set an exact
+# ListDbVersions release to pin it instead.
+# database_version = "23.26.3.0.0"
+
+# Standard Enterprise Edition is the default. Override only to use a different
+# OCI Base Database software edition.
+# database_edition = "ENTERPRISE_EDITION"
+
+# Database capacity defaults to VM.BaseDB.x86 with 16 ECPUs (32 GB memory).
+# For ECPU-based flexible shapes, database_cpu_core_count is the ECPU count.
+# It is ignored for fixed VM.Standard2 shapes.
+# Shape availability depends on the selected region, database version, and edition.
+# database_shape          = "VM.BaseDB.x86"
+# database_cpu_core_count = 16
+
+# Network CIDRs are fixed: VCN 10.0.0.0/16; public load-balancer subnet
+# 10.0.0.0/24; private compute subnet 10.0.1.0/24; private database subnet
+# 10.0.2.0/24. All database and compute private addresses are automatic.
+# DNS labels are fixed to myvcn11, mylb11, mycomputes, and mydb11. The generated
+# self-signed certificate common name is fixed to mycert11.
+
+# OCI selects the first available AD for mydb11 and the first ORDS node, then
+# distributes additional ORDS nodes across available ADs. Set this only to
+# choose the primary AD.
+# availability_domain = "replace-with-your-availability-domain"
+
+# The latest Oracle Linux image compatible with compute_shape is selected
+# automatically. Set compute_operating_system_version to pin a major version,
+# or set compute_image_ocid to pin a known, region-specific image.
+# compute_operating_system_version = "9"
+# compute_image_ocid = "ocid1.image.oc1.<region>.replace-me"
+
+# Number of ORDS nodes. The first performs the full bootstrap; the rest join as
+# configuration-only nodes. Nodes receive consecutive private IPs starting at .10
+# and are distributed across the available Availability Domains.
+ords_node_count = 2
+
+# Temporary 24-character passwords for SYS, ORDS_PUBLIC_USER, and the selected
+# REST-enabled schema are generated automatically. The only schema choice is
+# the REST-enabled username below. Never commit generated credentials.
+rest_schema_username = "ORDSDEMO"
+ords_auto_rest_auth  = false

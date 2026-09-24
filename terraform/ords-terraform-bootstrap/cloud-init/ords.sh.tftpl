@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec > >(tee -a /var/log/ords-bootstrap.log) 2>&1
+
+DB_HOSTNAME=${jsonencode(db_hostname)}
+DB_DOMAIN=${jsonencode(db_domain)}
+LB_SUBNET_CIDR=${jsonencode(lb_subnet_cidr)}
+VCN_CIDR=${jsonencode(vcn_cidr)}
+DB_ADMIN_PASSWORD=${jsonencode(db_admin_password)}
+ORDS_PROXY_PASSWORD=${jsonencode(ords_proxy_password)}
+INSTALL_MODE=${jsonencode(install_mode)}
+REST_SCHEMA_USERNAME=${jsonencode(rest_schema_username)}
+REST_SCHEMA_PASSWORD=${jsonencode(rest_schema_password)}
+ORDS_AUTO_REST_AUTH=${jsonencode(ords_auto_rest_auth ? "TRUE" : "FALSE")}
+REST_USER_SQL_B64=${jsonencode(rest_user_sql_b64)}
+CONFIG_DIR=/etc/ords/config
+LOG_DIR=/var/log/ords
+REST_USER_SQL_PATH=/opt/ords/bootstrap/create_rest_user.sql
+
+yum --assumeyes --quiet update
+yum install --assumeyes --quiet nc ords sqlcl jdk-25 firewalld
+
+systemctl enable --now firewalld
+VCN_ORDS_RULE="rule family=\"ipv4\" source address=\"$LB_SUBNET_CIDR\" port port=\"8080\" protocol=\"tcp\" accept"
+firewall-cmd --permanent --zone=public --query-rich-rule="$VCN_ORDS_RULE" || \
+  firewall-cmd --permanent --zone=public --add-rich-rule="$VCN_ORDS_RULE"
+VCN_SSH_RULE="rule family=\"ipv4\" source address=\"$VCN_CIDR\" port port=\"22\" protocol=\"tcp\" accept"
+firewall-cmd --permanent --zone=public --query-rich-rule="$VCN_SSH_RULE" || \
+  firewall-cmd --permanent --zone=public --add-rich-rule="$VCN_SSH_RULE"
+# Oracle Linux commonly enables the broad ssh service in the public zone.
+# Remove it so the VCN-scoped rich rule above is the host-level SSH policy.
+if firewall-cmd --permanent --zone=public --query-service=ssh; then
+  firewall-cmd --permanent --zone=public --remove-service=ssh
+fi
+firewall-cmd --reload
+
+mkdir -p "$LOG_DIR"
+chown -R oracle:oinstall "$CONFIG_DIR" "$LOG_DIR"
+chmod 750 "$CONFIG_DIR" "$LOG_DIR"
+find "$CONFIG_DIR" "$LOG_DIR" -type d -exec chmod 750 {} +
+find "$CONFIG_DIR" "$LOG_DIR" -type f -exec chmod 640 {} +
+install -d -m 750 -o oracle -g oinstall /opt/ords/bootstrap
+printf '%s' "$REST_USER_SQL_B64" | base64 --decode > "$REST_USER_SQL_PATH"
+chown oracle:oinstall "$REST_USER_SQL_PATH"
+chmod 640 "$REST_USER_SQL_PATH"
+
+# PDB provisioning is ordered in Terraform, but keep a bounded network wait for
+# database listener start-up after Base DB creation or maintenance.
+for attempt in $(seq 1 60); do
+  if nc -z -w 5 "$DB_HOSTNAME" 1521; then
+    break
+  fi
+  if [ "$attempt" -eq 60 ]; then
+    echo "Database listener at $DB_HOSTNAME:1521 was not reachable after 20 minutes" >&2
+    exit 1
+  fi
+  sleep 20
+done
+
+sudo -iu oracle env \
+  PATH="/usr/local/bin:/usr/bin:/bin" \
+  DB_HOSTNAME="$DB_HOSTNAME" \
+  DB_DOMAIN="$DB_DOMAIN" \
+  DB_ADMIN_PASSWORD="$DB_ADMIN_PASSWORD" \
+  ORDS_PROXY_PASSWORD="$ORDS_PROXY_PASSWORD" \
+  INSTALL_MODE="$INSTALL_MODE" \
+  REST_SCHEMA_USERNAME="$REST_SCHEMA_USERNAME" \
+  REST_SCHEMA_PASSWORD="$REST_SCHEMA_PASSWORD" \
+  ORDS_AUTO_REST_AUTH="$ORDS_AUTO_REST_AUTH" \
+  REST_USER_SQL_PATH="$REST_USER_SQL_PATH" \
+  CONFIG_DIR="$CONFIG_DIR" \
+  LOG_DIR="$LOG_DIR" \
+  bash -s <<'ORACLE_SCRIPT'
+set -euo pipefail
+echo 'export PATH="$PATH:/usr/local/bin"' >> ~/.bash_profile
+export PATH="$PATH:/usr/local/bin"
+
+install_pool() {
+  local pool="$1"
+  local mode_args=()
+  if [ "$INSTALL_MODE" = "config-only" ]; then
+    mode_args+=(--config-only)
+  fi
+
+  printf '%s\n%s\n' "$DB_ADMIN_PASSWORD" "$ORDS_PROXY_PASSWORD" | ords \
+    --config "$CONFIG_DIR" install "$${mode_args[@]}" \
+    --db-pool "$pool" \
+    --db-hostname "$DB_HOSTNAME" \
+    --db-port 1521 \
+    --db-servicename "$pool.$DB_DOMAIN" \
+    --feature-db-api true \
+    --feature-rest-enabled-sql true \
+    --feature-sdw true \
+    --log-folder "$LOG_DIR" \
+    --admin-user SYS \
+    --proxy-user \
+    --password-stdin
+}
+
+install_pool pdb1
+install_pool pdb2
+ords --config "$CONFIG_DIR" config set security.httpsHeaderCheck "X-Forwarded-Proto: http"
+
+# Schema provisioning is intentionally limited to the first, full ORDS install.
+# Config-only nodes share the database and must not create the same schemas.
+if [ "$INSTALL_MODE" = "full" ]; then
+  run_rest_user_bootstrap() {
+    local pdb="$1"
+    sql -s /nolog <<SQL
+WHENEVER OSERROR EXIT FAILURE
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+CONNECT sys/"$DB_ADMIN_PASSWORD"@//$DB_HOSTNAME:1521/$pdb.$DB_DOMAIN AS SYSDBA
+SET TERMOUT OFF
+SET DEFINE OFF
+DEFINE target_user = "$REST_SCHEMA_USERNAME"
+DEFINE target_password = "$REST_SCHEMA_PASSWORD"
+DEFINE ORDS_AUTO_REST_AUTH = "$ORDS_AUTO_REST_AUTH"
+SET DEFINE ON
+SET TERMOUT ON
+@"$REST_USER_SQL_PATH"
+EXIT
+SQL
+  }
+
+  run_rest_user_bootstrap pdb1
+  run_rest_user_bootstrap pdb2
+fi
+ORACLE_SCRIPT
+
+systemctl enable ords
+systemctl enable --now ords
