@@ -1,0 +1,57 @@
+services:
+  vector-search:
+    build:
+      context: .
+    image: vector-search-oauth-demo:latest
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      REQUEST_TIMEOUT_MS: "${REQUEST_TIMEOUT_MS:-15000}"
+      ORDS_BASE_ENDPOINT: "${ORDS_BASE_ENDPOINT:-}"
+      ORDS_CLIENT_ID: "${ORDS_CLIENT_ID:-}"
+      ORDS_CLIENT_SECRET: "${ORDS_CLIENT_SECRET:-}"
+      ORDS_MODEL_NAME: "${ORDS_MODEL_NAME:-minilm_l12_v2}"
+
+  db26ai:
+    profiles: ["oracle-stack"]
+    image: container-registry.oracle.com/database/free:latest
+    hostname: database
+    ports:
+      - "${DB_PORT:-1521}:1521"
+    environment:
+      ORACLE_PDB: "${ORACLE_PDB:-FREEPDB1}"
+      ORACLE_PWD: "${ORACLE_PWD:-oracle}"
+      DBHOST: database
+    volumes:
+      - db_files:/opt/oracle/oradata
+
+  ords:
+    profiles: ["oracle-stack"]
+    image: container-registry.oracle.com/database/ords:latest
+    hostname: ords
+    restart: on-failure
+    ports:
+      - "${ORDS_PORT:-8080}:8080"
+    environment:
+      DBSERVICENAME: "${ORACLE_PDB:-FREEPDB1}"
+      DBHOST: database
+      DBPORT: 1521
+      ORACLE_PWD: "${ORACLE_PWD:-oracle}"
+      # JDK_JAVA_OPTIONS: -Xms1024M -Xmx1024M
+    volumes:
+      - ords_config:/etc/ords/config
+      - ords_apex:/opt/oracle/apex
+    healthcheck:
+      test: ["CMD-SHELL", "curl --noproxy 'localhost' -f -k http://localhost:8080/ords/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 150
+    depends_on:
+      db26ai:
+        condition: service_healthy
+
+volumes:
+  db_files:
+  ords_apex:
+  ords_config:

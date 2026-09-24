@@ -3,23 +3,45 @@ const http = require("http");
 const fs = require("fs");
 const fsPromises = require("fs/promises");
 const path = require("path");
+const { createAuthService } = require("./auth/auth-service");
+const { createOrdsOauthClient } = require("./auth/oauth2-client");
 
 // Loads the `.env` values before reading configuration from `process.env`.
 loadDotEnv();
 
 // Reads configuration once at startup.
 // Converts numeric settings once, avoiding the use of Number(...) throughout.
-const PORT = Number(process.env.PORT);
-const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS);
+const PORT = Number(process.env.PORT || 3000);
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 15000);
 const ORDS_BASE_ENDPOINT = process.env.ORDS_BASE_ENDPOINT;
 const ORDS_CLIENT_ID = process.env.ORDS_CLIENT_ID;
 const ORDS_CLIENT_SECRET = process.env.ORDS_CLIENT_SECRET;
-const ORDS_MODEL_NAME = process.env.ORDS_MODEL_NAME;
+const ORDS_MODEL_NAME = process.env.ORDS_MODEL_NAME || "minilm_l12_v2";
 
 // Builds off the ORDS_BASE_ENDPOINT of your .env file.
-const TOKEN_ENDPOINT = ORDS_BASE_ENDPOINT + "/oauth/token";
-const EMBED_ENDPOINT = ORDS_BASE_ENDPOINT + "/_/db-api/stable/vecdb/embed";
-const SEARCH_ENDPOINT = ORDS_BASE_ENDPOINT + "/parks/vectorSearch";
+const EMBED_ENDPOINT = ORDS_BASE_ENDPOINT
+  ? ORDS_BASE_ENDPOINT + "/_/db-api/stable/vecdb/embed"
+  : "";
+const MODELS_ENDPOINT = ORDS_BASE_ENDPOINT
+  ? ORDS_BASE_ENDPOINT + "/_/db-api/stable/vecdb/models/"
+  : "";
+const SEARCH_ENDPOINT = ORDS_BASE_ENDPOINT
+  ? ORDS_BASE_ENDPOINT + "/parks/vectorSearch"
+  : "";
+const AUTH_CONFIG_ENDPOINT = "/api/auth/config";
+const MODELS_API_ENDPOINT = "/api/models";
+const ordsOauthClient = createOrdsOauthClient({
+  baseEndpoint: ORDS_BASE_ENDPOINT,
+  clientId: ORDS_CLIENT_ID,
+  clientSecret: ORDS_CLIENT_SECRET,
+  modelName: ORDS_MODEL_NAME,
+  requestTimeoutMs: REQUEST_TIMEOUT_MS
+});
+const authService = createAuthService({
+  authConfigEndpoint: AUTH_CONFIG_ENDPOINT,
+  healthEndpoint: "/healthcheck",
+  oauth2Client: ordsOauthClient
+});
 
 // These are purely for your convenience. Your own ORDS install (in ADB, or self-managed) already includes this endpoint and others in the ORDS DB-API.
 const WEB_ROOT = __dirname;
@@ -91,18 +113,7 @@ function loadDotEnv() {
   }
 }
 
-// Exception handling for missing secrets. Checks prior-to Node.js server start-up.
-function readRequiredConfig() {
-  if (!ORDS_CLIENT_ID || !ORDS_CLIENT_SECRET) {
-    throw new Error(
-      "Set ORDS_CLIENT_ID and ORDS_CLIENT_SECRET before starting the Node server."
-    );
-  }
-}
-
-// Reads and parses the incoming request body (e.g. user's query) for POST requests.
-// NOTE: Request streams arrive in chunks; collection occurs first.
-async function readRequestBody(request) {
+async function readRequestText(request) {
   const chunks = [];
 
   for await (const chunk of request) {
@@ -110,6 +121,14 @@ async function readRequestBody(request) {
   }
 
   const text = Buffer.concat(chunks).toString("utf8");
+
+  return text;
+}
+
+// Reads and parses the incoming request body (e.g. user's query) for POST requests.
+// NOTE: Request streams arrive in chunks; collection occurs first.
+async function readRequestBody(request) {
+  const text = await readRequestText(request);
 
   if (!text) {
     return {};
@@ -155,32 +174,6 @@ async function fetchWithTimeout(url, options, timeoutMs = REQUEST_TIMEOUT_MS) {
   }
 }
 
-// Exchanges the ORDS Client ID and Client Secret for a OAuth2.0 Access Token.
-// The Access Token is used for two HTTP requests: the initial vector embedding (the user's query), and 
-// then the /vectorSearch operation. The second operation queries the Auto-REST enabled PARKS; using the query Vector from the first HTTP request.
-async function getAccessToken() {
-  const credentials = Buffer.from(ORDS_CLIENT_ID + ":" + ORDS_CLIENT_SECRET).toString("base64");
-  const response = await fetchWithTimeout(TOKEN_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: "Basic " + credentials,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "grant_type=client_credentials"
-  });
-  const body = await readResponseBody(response);
-
-  if (!response.ok) {
-    throw new Error(getProblemMessage(body));
-  }
-
-  if (!body || typeof body.access_token !== "string") {
-    throw new Error("Access token not found in OAuth response.");
-  }
-
-  return body.access_token;
-}
-
 // Obtains the Vector embedding [array] from the user's query, to use for the /vectorSearch operation.
 function extractEmbedding(payload) {
   const embedding = payload?.data?.[0]?.embedding;
@@ -193,7 +186,7 @@ function extractEmbedding(payload) {
 }
 
 // Sends a user's 'plain language" query to the /vecdb/embed endpoint for converting to a Vector embed array.
-async function postEmbedding(text, accessToken) {
+async function postEmbedding(text, accessToken, modelName) {
   const response = await fetchWithTimeout(EMBED_ENDPOINT, {
     method: "POST",
     headers: {
@@ -201,7 +194,7 @@ async function postEmbedding(text, accessToken) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      modelName: ORDS_MODEL_NAME,
+      modelName,
       inputs: [{ text }]
     })
   });
@@ -212,6 +205,49 @@ async function postEmbedding(text, accessToken) {
   }
 
   return extractEmbedding(body);
+}
+
+function extractModelName(model) {
+  const modelName = model?.model_name || model?.modelName;
+
+  return typeof modelName === "string" ? modelName : "";
+}
+
+function normalizeModelItem(model) {
+  return {
+    modelName: extractModelName(model),
+    algorithm: model?.algorithm || "",
+    miningFunction: model?.mining_function || "",
+    creationDate: model?.creation_date || ""
+  };
+}
+
+function extractModelItems(payload) {
+  if (Array.isArray(payload?.items)) {
+    return payload.items;
+  }
+
+  throw new Error("Model list not found in vecdb/models response.");
+}
+
+async function fetchModels(accessToken) {
+  const response = await fetchWithTimeout(MODELS_ENDPOINT, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + accessToken,
+      "Content-Type": "application/json"
+    }
+  });
+  const body = await readResponseBody(response);
+
+  if (!response.ok) {
+    throw new Error(getProblemMessage(body));
+  }
+
+  return extractModelItems(body)
+    .map(normalizeModelItem)
+    .filter((model) => model.modelName)
+    .sort((left, right) => left.modelName.localeCompare(right.modelName));
 }
 
 // Uses the newly created Vector array to search the PARKS /vectorSearch endpoint. The results of this search are the 
@@ -311,6 +347,11 @@ function sendText(response, statusCode, message) {
   response.end(message);
 }
 
+function sendNoContent(response, statusCode) {
+  response.writeHead(statusCode);
+  response.end();
+}
+
 function sendRedirect(response, location) {
   response.writeHead(302, { Location: location });
   response.end();
@@ -400,20 +441,95 @@ async function serveStatic(request, response, pathname) {
 // -> perform vectorSearch on the PARKS table -> sort response into rows, in order of most similar to least 
 // -> return the results to the browser front end. 
 async function handleSearch(request, response) {
+  if (!authService.hasOrdsBaseConfig()) {
+    sendProblem(
+      response,
+      503,
+      "Service Unavailable",
+      "ORDS search configuration is missing. Set ORDS_BASE_ENDPOINT and ORDS_MODEL_NAME."
+    );
+    return;
+  }
+
   const body = await readRequestBody(request);
   const text = typeof body.text === "string" ? body.text.trim() : "";
+  const requestedModelName =
+    typeof body.modelName === "string" ? body.modelName.trim() : "";
+  const modelName = requestedModelName || ORDS_MODEL_NAME;
 
   if (!text) {
     sendProblem(response, 400, "Bad Request", "Enter a search term.");
     return;
   }
 
-  const accessToken = await getAccessToken();
-  const vector = await postEmbedding(text, accessToken);
+  let authResult;
+
+  try {
+    authResult = await authService.getSearchAccessToken();
+  } catch (error) {
+    sendProblem(
+      response,
+      400,
+      "Bad Request",
+      error instanceof Error ? error.message : "Invalid auth configuration."
+    );
+    return;
+  }
+
+  const accessToken = authResult.accessToken;
+  const vector = await postEmbedding(text, accessToken, modelName);
   const searchResponse = await postVectorSearch(vector, accessToken);
   const rows = sortRowsBySimilarity(extractRows(searchResponse));
   const items = rows.map(normalizeResultRow);
-  sendJson(response, 200, { items });
+  sendJson(response, 200, {
+    authMode: authResult.authMode,
+    modelName,
+    items
+  });
+}
+
+function handleAuthConfiguration(request, response) {
+  sendJson(response, 200, authService.buildPublicAuthConfiguration(request));
+}
+
+async function handleModels(request, response) {
+  if (!authService.hasOrdsBaseConfig()) {
+    sendProblem(
+      response,
+      503,
+      "Service Unavailable",
+      "ORDS model configuration is missing. Set ORDS_BASE_ENDPOINT and ORDS_MODEL_NAME."
+    );
+    return;
+  }
+
+  let authResult;
+
+  try {
+    authResult = await authService.getSearchAccessToken();
+  } catch (error) {
+    sendProblem(
+      response,
+      400,
+      "Bad Request",
+      error instanceof Error ? error.message : "Invalid auth configuration."
+    );
+    return;
+  }
+
+  const items = await fetchModels(authResult.accessToken);
+  sendJson(response, 200, {
+    defaultModelName: ORDS_MODEL_NAME,
+    items
+  });
+}
+
+// `/healthcheck` is an operational endpoint for container platforms, reverse
+// proxies, and developers to confirm that the service is running and whether
+// the ORDS-backed search configuration is present. It is not part of the user
+// search flow; it is used by GET/HEAD probes and quick diagnostics.
+function handleHealth(request, response) {
+  sendJson(response, 200, authService.buildHealthPayload());
 }
 
 // The main HTTP server; doesn't rely on Express. Again, this cuts down on the required dependencies.
@@ -428,6 +544,36 @@ const server = http.createServer(async (request, response) => {
     const url = new URL(request.url, "http://127.0.0.1");
 
     if (request.method === "GET" || request.method === "HEAD") {
+      if (url.pathname === "/healthcheck") {
+        if (request.method === "HEAD") {
+          sendNoContent(response, 200);
+          return;
+        }
+
+        handleHealth(request, response);
+        return;
+      }
+
+      if (url.pathname === AUTH_CONFIG_ENDPOINT) {
+        if (request.method === "HEAD") {
+          sendNoContent(response, 200);
+          return;
+        }
+
+        handleAuthConfiguration(request, response);
+        return;
+      }
+
+      if (url.pathname === MODELS_API_ENDPOINT) {
+        if (request.method === "HEAD") {
+          sendNoContent(response, 200);
+          return;
+        }
+
+        await handleModels(request, response);
+        return;
+      }
+
       if (url.pathname === DOCS_ROUTE_PREFIX) {
         sendRedirect(response, DOCS_ROUTE_PREFIX + "/");
         return;
@@ -448,9 +594,6 @@ const server = http.createServer(async (request, response) => {
     sendProblem(response, 500, "Internal Server Error", message);
   }
 });
-
-// Validates configuration prior to opening the port. 
-readRequiredConfig();
 
 // Starts listening at "sever:port" for browser requests.
 server.listen(PORT, () => {

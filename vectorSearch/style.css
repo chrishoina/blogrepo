@@ -696,3 +696,33 @@ ul [role="menu-item"].divider::after {
 .menu-items > li {
   margin-bottom: 1rem;
 }
+
+.auth-copy {
+  margin: 0.35rem 0 0.75rem 0;
+}
+
+.auth-links {
+  margin: 0.75rem 0 1rem 0;
+}
+
+.auth-claims-row {
+  align-items: flex-start;
+}
+
+.auth-claims-row label {
+  padding-top: 0.35rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 8rem;
+  resize: vertical;
+  border: 1.5px solid var(--secondary);
+  font-family: Monaco, monospace;
+  font-size: 15px;
+  padding: 0.5rem;
+}
+
+.auth-claims-row textarea {
+  flex: 1;
+}

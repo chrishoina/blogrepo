@@ -1,0 +1,715 @@
+<!-- This dashboard is for demonstration purposes only. This should not be used in a production environment.
+ The Username and Password are passed as an HTTP request header, in Base 64 encoded format. So use this demo 
+ dashboard in a development environment only. -->
+
+ <!-- To deploy this locally, without any issues, add this file to a temporary directory, for instance I chose: /opt/oracle/ords/dashboard.
+  And then placed the instance.html file inside dashboard. 
+  
+  Then, I set the ORDS configuration setting standalone.doc.root like this: ords config set standalone.doc.root /opt/oracle/ords/dashboard 
+  I restart my ORDS deployment to pick up this change, then I'm able to access this dashboard via: http://127.0.0.1:8080/instance 
+  
+  I'm including this dashboard so you can get an idea of the kinds of things you can do with the information coming from these Instance APIs.
+
+  Email me if you have any issues: chris.hoina@oracle.com
+
+  Good luck! -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORDS Pool Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4efe5;
+      --panel: rgba(255, 252, 245, 0.9);
+      --panel-strong: #fffaf2;
+      --ink: #1c1b18;
+      --muted: #5c584f;
+      --line: rgba(71, 54, 23, 0.14);
+      --accent: #156f62;
+      --accent-2: #d47a1f;
+      --good: #18794e;
+      --warn: #b66a00;
+      --bad: #b42318;
+      --shadow: 0 18px 45px rgba(62, 43, 11, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(21, 111, 98, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(212, 122, 31, 0.18), transparent 28%),
+        linear-gradient(180deg, #f8f4ec 0%, var(--bg) 55%, #efe7d8 100%);
+    }
+
+    .shell {
+      width: min(1400px, calc(100% - 32px));
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255, 251, 243, 0.94), rgba(246, 238, 224, 0.88));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3.4vw, 3.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .subhead {
+      margin: 10px 0 0;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button,
+    select {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font: inherit;
+    }
+
+    button {
+      padding: 12px 18px;
+      cursor: pointer;
+      background: var(--ink);
+      color: #fff;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    select {
+      padding: 12px 14px;
+      background: var(--panel-strong);
+      color: var(--ink);
+    }
+
+    .stamp {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--line);
+    }
+
+    .metrics {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+
+    .grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      border-radius: 24px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .section-title {
+      margin: 18px 0 8px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+    }
+
+    .kv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kv {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(71, 54, 23, 0.1);
+    }
+
+    .kv-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kv-value {
+      margin-top: 6px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .list,
+    .stats-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .list li,
+    .stats-list li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(71, 54, 23, 0.1);
+    }
+
+    .link-rel {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .url {
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+    }
+
+    .stats-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .stats-key {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .stats-value {
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      border-radius: 18px;
+      background: #201d18;
+      color: #f5efe2;
+      overflow: auto;
+      max-height: 320px;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .status-line {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .status-line.error {
+      color: var(--bad);
+      background: rgba(251, 233, 231, 0.9);
+      border-color: rgba(180, 35, 24, 0.2);
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px dashed rgba(71, 54, 23, 0.16);
+    }
+
+    @media (max-width: 1120px) {
+      .grid,
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .shell {
+        width: min(100% - 20px, 100%);
+        margin-top: 10px;
+      }
+
+      .hero,
+      .panel {
+        border-radius: 22px;
+      }
+
+      .grid,
+      .metrics,
+      .kv-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        width: 100%;
+      }
+
+      button,
+      select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>ORDS Pool Dashboard</h1>
+          <p class="subhead">
+            Live view of instance status, pool cache inventory, and detailed metrics for the
+            <code>default,local</code> pool.
+          </p>
+        </div>
+        <div class="toolbar">
+          <select id="refreshInterval" aria-label="Auto refresh interval">
+            <option value="0">Manual refresh</option>
+            <option value="5000">Every 5 seconds</option>
+            <option value="15000" selected>Every 15 seconds</option>
+            <option value="30000">Every 30 seconds</option>
+            <option value="60000">Every 60 seconds</option>
+          </select>
+          <button id="refreshButton" type="button">Refresh now</button>
+        </div>
+      </div>
+
+      <div class="stamp">
+        <span class="badge">Host: <strong>127.0.0.1:8080</strong></span>
+        <span class="badge">Auth: <strong>Basic</strong></span>
+        <span class="badge">Pool: <strong>default,local</strong></span>
+      </div>
+
+      <div class="metrics">
+        <article class="metric">
+          <span class="metric-label">Pool Health</span>
+          <div class="metric-value" id="healthMetric">...</div>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Valid Pools</span>
+          <div class="metric-value" id="validPoolsMetric">...</div>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Borrowed Connections</span>
+          <div class="metric-value" id="borrowedMetric">...</div>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Available Connections</span>
+          <div class="metric-value" id="availableMetric">...</div>
+        </article>
+      </div>
+
+      <div class="status-line" id="statusLine">Waiting for first refresh.</div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Pool Health</h2>
+          <span class="panel-note">/status</span>
+        </div>
+        <div class="kv-grid" id="statusSummary"></div>
+        <div class="section-title">Links</div>
+        <ul class="list" id="statusLinks"></ul>
+        <div class="section-title">Raw JSON</div>
+        <pre id="statusRaw"></pre>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Pool Cache Details</h2>
+          <span class="panel-note">/database-pools-cache/</span>
+        </div>
+        <div class="kv-grid" id="cacheSummary"></div>
+        <div class="section-title">Pools</div>
+        <ul class="list" id="cacheItems"></ul>
+        <div class="section-title">Raw JSON</div>
+        <pre id="cacheRaw"></pre>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Pool Details</h2>
+          <span class="panel-note">/database-pools-cache/default,local</span>
+        </div>
+        <div class="kv-grid" id="detailSummary"></div>
+        <div class="section-title">Statistics</div>
+        <ul class="stats-list" id="detailStats"></ul>
+        <div class="section-title">Raw JSON</div>
+        <pre id="detailRaw"></pre>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const AUTH_HEADER = "Basic [Your Base 64 encoded username:password]";
+    const BASE_URL = "http://127.0.0.1:8080/ords/_/instance-api/stable";
+    const ENDPOINTS = {
+      status: `${BASE_URL}/status`,
+      cache: `${BASE_URL}/database-pools-cache/`,
+      detail: `${BASE_URL}/database-pools-cache/default,local`
+    };
+
+    const state = {
+      timerId: null
+    };
+
+    const elements = {
+      refreshButton: document.getElementById("refreshButton"),
+      refreshInterval: document.getElementById("refreshInterval"),
+      statusLine: document.getElementById("statusLine"),
+      healthMetric: document.getElementById("healthMetric"),
+      validPoolsMetric: document.getElementById("validPoolsMetric"),
+      borrowedMetric: document.getElementById("borrowedMetric"),
+      availableMetric: document.getElementById("availableMetric"),
+      statusSummary: document.getElementById("statusSummary"),
+      statusLinks: document.getElementById("statusLinks"),
+      statusRaw: document.getElementById("statusRaw"),
+      cacheSummary: document.getElementById("cacheSummary"),
+      cacheItems: document.getElementById("cacheItems"),
+      cacheRaw: document.getElementById("cacheRaw"),
+      detailSummary: document.getElementById("detailSummary"),
+      detailStats: document.getElementById("detailStats"),
+      detailRaw: document.getElementById("detailRaw")
+    };
+
+    function formatValue(value) {
+      if (value === null || value === undefined || value === "") {
+        return "n/a";
+      }
+      if (typeof value === "number") {
+        return value.toLocaleString();
+      }
+      return String(value);
+    }
+
+    function setMetric(element, value, tone) {
+      element.textContent = value;
+      element.className = "metric-value";
+      if (tone) {
+        element.classList.add(tone);
+      }
+    }
+
+    function createKvItem(label, value) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "kv";
+
+      const title = document.createElement("span");
+      title.className = "kv-label";
+      title.textContent = label;
+
+      const body = document.createElement("div");
+      body.className = "kv-value";
+      body.textContent = formatValue(value);
+
+      wrapper.append(title, body);
+      return wrapper;
+    }
+
+    function renderKvGrid(container, entries) {
+      container.replaceChildren();
+      entries.forEach(([label, value]) => container.appendChild(createKvItem(label, value)));
+    }
+
+    function renderLinks(container, links) {
+      container.replaceChildren();
+
+      if (!Array.isArray(links) || links.length === 0) {
+        container.appendChild(createEmptyState("No links returned."));
+        return;
+      }
+
+      links.forEach((link) => {
+        const item = document.createElement("li");
+        const rel = document.createElement("span");
+        rel.className = "link-rel";
+        rel.textContent = link.rel || "link";
+
+        const url = document.createElement("div");
+        url.className = "url";
+        url.textContent = link.href || "n/a";
+
+        item.append(rel, url);
+        container.appendChild(item);
+      });
+    }
+
+    function renderCacheItems(container, items) {
+      container.replaceChildren();
+
+      if (!Array.isArray(items) || items.length === 0) {
+        container.appendChild(createEmptyState("No pools found in cache."));
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement("li");
+        row.innerHTML = `
+          <span class="link-rel">${formatValue(item.id)}</span>
+          <div class="stats-key">Created: ${formatValue(item.created)}</div>
+          <div class="stats-key">Validity: ${formatValue(item.validity)}</div>
+          <div class="stats-key">Borrowed: ${formatValue(item.borrowedConnectionsCount)}</div>
+          <div class="stats-key">Available: ${formatValue(item.availableConnectionsCount)}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderStats(container, stats) {
+      container.replaceChildren();
+
+      const entries = Object.entries(stats || {});
+      if (entries.length === 0) {
+        container.appendChild(createEmptyState("No pool statistics returned."));
+        return;
+      }
+
+      entries.forEach(([key, value]) => {
+        const item = document.createElement("li");
+
+        const statKey = document.createElement("span");
+        statKey.className = "stats-key";
+        statKey.textContent = key;
+
+        const statValue = document.createElement("span");
+        statValue.className = "stats-value";
+        statValue.textContent = formatValue(
+          typeof value === "object" && value !== null ? JSON.stringify(value) : value
+        );
+
+        item.append(statKey, statValue);
+        container.appendChild(item);
+      });
+    }
+
+    function createEmptyState(message) {
+      const node = document.createElement("div");
+      node.className = "empty";
+      node.textContent = message;
+      return node;
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: AUTH_HEADER,
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
+      }
+
+      return response.json();
+    }
+
+    function renderStatus(status) {
+      const valid = Number(status.valid_pools_count || 0);
+      const invalid = Number(status.invalid_pools_count || 0);
+      const health = invalid === 0 && valid > 0 ? "Healthy" : invalid > 0 ? "Degraded" : "Unknown";
+      const tone = invalid === 0 && valid > 0 ? "good" : invalid > 0 ? "bad" : "warn";
+
+      setMetric(elements.healthMetric, health, tone);
+      setMetric(elements.validPoolsMetric, formatValue(valid), valid > 0 ? "good" : "warn");
+
+      renderKvGrid(elements.statusSummary, [
+        ["Valid Pools", valid],
+        ["Invalid Pools", invalid],
+        ["Health", health]
+      ]);
+      renderLinks(elements.statusLinks, status.links);
+      elements.statusRaw.textContent = JSON.stringify(status, null, 2);
+    }
+
+    function renderCache(cache) {
+      const items = Array.isArray(cache.items) ? cache.items : [];
+      const firstPool = items[0] || {};
+
+      setMetric(elements.borrowedMetric, formatValue(firstPool.borrowedConnectionsCount ?? 0), "warn");
+      setMetric(elements.availableMetric, formatValue(firstPool.availableConnectionsCount ?? 0), "good");
+
+      renderKvGrid(elements.cacheSummary, [
+        ["Pool Entries", items.length],
+        ["First Pool ID", firstPool.id || "n/a"],
+        ["Created", firstPool.created || "n/a"],
+        ["Validity", firstPool.validity || "n/a"]
+      ]);
+      renderCacheItems(elements.cacheItems, items);
+      elements.cacheRaw.textContent = JSON.stringify(cache, null, 2);
+    }
+
+    function renderDetail(detail) {
+      renderKvGrid(elements.detailSummary, [
+        ["Pool ID", detail.id],
+        ["Lifecycle", detail.lifecycleState],
+        ["Validity", detail.validity],
+        ["Created", detail.created],
+        ["Borrowed", detail.borrowedConnectionsCount],
+        ["Available", detail.availableConnectionsCount]
+      ]);
+      renderStats(elements.detailStats, detail.statistics);
+      elements.detailRaw.textContent = JSON.stringify(detail, null, 2);
+    }
+
+    function updateStatusLine(message, isError = false) {
+      elements.statusLine.textContent = message;
+      elements.statusLine.classList.toggle("error", isError);
+    }
+
+    async function refreshDashboard() {
+      elements.refreshButton.disabled = true;
+      updateStatusLine("Refreshing dashboard data...");
+
+      try {
+        const [status, cache, detail] = await Promise.all([
+          fetchJson(ENDPOINTS.status),
+          fetchJson(ENDPOINTS.cache),
+          fetchJson(ENDPOINTS.detail)
+        ]);
+
+        renderStatus(status);
+        renderCache(cache);
+        renderDetail(detail);
+
+        updateStatusLine(`Last updated: ${new Date().toLocaleString()}`);
+      } catch (error) {
+        updateStatusLine(
+          `Refresh failed: ${error.message}. If the page is opened as a local file, the browser may block cross-origin requests unless ORDS allows CORS.`,
+          true
+        );
+      } finally {
+        elements.refreshButton.disabled = false;
+      }
+    }
+
+    function applyRefreshInterval() {
+      if (state.timerId) {
+        window.clearInterval(state.timerId);
+      }
+
+      const interval = Number(elements.refreshInterval.value);
+      if (interval > 0) {
+        state.timerId = window.setInterval(refreshDashboard, interval);
+      } else {
+        state.timerId = null;
+      }
+    }
+
+    elements.refreshButton.addEventListener("click", refreshDashboard);
+    elements.refreshInterval.addEventListener("change", applyRefreshInterval);
+
+    applyRefreshInterval();
+    refreshDashboard();
+  </script>
+</body>
+</html>
