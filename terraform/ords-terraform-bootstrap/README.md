@@ -11,6 +11,8 @@ This stack creates only the requested OCI resources from the reference export:
 
 Cloud-init installs system updates, `nc`, ORDS, SQLcl, JDK 25, and firewalld. It permits TCP/8080 only from the LB subnet CIDR at the host firewall, sets ORDS directory ownership/permissions, waits for the database listener, and starts the systemd ORDS service.
 
+The compute NSG also allows all outbound IPv4 traffic (`protocol = "all"`, destination `0.0.0.0/0`). The compute subnet routes this traffic through the NAT Gateway so cloud-init can install OS updates and required packages. This broad egress rule is a convenience for this demonstration stack, not a least-privilege production policy. Production deployments should restrict outbound destinations and ports to approved package repositories and required OCI services, potentially using a Service Gateway or an approved egress proxy. Allowlisting those destinations improves security but requires ongoing maintenance as package sources and dependencies change.
+
 The first ORDS node (`compute01`) performs the full ORDS install for `pdb1` and `pdb2`. Every additional node uses `ords install --config-only` for both pools. All nodes set `security.httpsHeaderCheck` to `X-Forwarded-Proto: http`, because TLS terminates at `mylb`. 
 
 After the full install, `compute01` also runs [sql/create_rest_user.sql](sql/create_rest_user.sql) once in each PDB with SQLcl. The script is non-interactive: cloud-init passes `rest_schema_username`, the effective sensitive REST schema password, and `ords_auto_rest_auth` as SQLcl `DEFINE` values before invoking it. The schema password is used only when the schema does not already exist; re-runs preserve an existing schema's password. Config-only nodes do not run this database-level bootstrap.

@@ -99,7 +99,7 @@ install_pool() {
 
 install_pool pdb1
 install_pool pdb2
-ords --config "$CONFIG_DIR" config set security.httpsHeaderCheck "X-Forwarded-Proto: http"
+ords --config "$CONFIG_DIR" config set security.httpsHeaderCheck "X-Forwarded-Proto: https"
 
 # Schema provisioning is intentionally limited to the first, full ORDS install.
 # Config-only nodes share the database and must not create the same schemas.
